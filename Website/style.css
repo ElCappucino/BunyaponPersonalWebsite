@@ -1,0 +1,279 @@
+/* =========================================================
+   Tokens — from DESIGN.md §2 (draft values, pixel-sampled
+   from DraftScreenshot/Home_SelectGame.png + Home_ShowGame.png,
+   not yet confirmed against Figma Dev Mode — see §7)
+   ========================================================= */
+:root {
+  --color-bg:        #EEE4DD;
+  --color-surface:   #D9D9D9;
+  --color-text:      #000000;
+  --color-primary:   #583600;
+  --color-accent:    #583600;
+
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 24px;
+  --space-6: 32px;
+  --space-7: 48px;
+  --space-8: 64px;
+  --space-9: 96px;
+
+  --radius-card: 10px;
+  --radius-full: 9999px;
+
+  --max-content-width: 1600px;
+}
+
+/* =========================================================
+   Base
+   ========================================================= */
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: "Poppins", sans-serif;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+img {
+  max-width: 100%;
+}
+
+.page {
+  position: relative;
+  overflow-x: hidden; /* lets the coffee cup bleed off the true browser edge, at any width,
+                          without a horizontal scrollbar */
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column; /* topbar keeps its natural height; games-layout (flex: 1 0 auto)
+                              fills everything below it, so the case-stack can be centered
+                              in the true remaining viewport height without hardcoding the
+                              navbar's height anywhere */
+}
+
+/* The header keeps a soft width ceiling so the nav doesn't drift too far
+   from the brand on huge monitors. .games-layout is intentionally NOT
+   capped here any more — the grid needs to reach the true right edge of
+   the screen for .games-grid-wrap to center against it, and the grid's
+   own minmax() column sizing already stops individual cards from
+   stretching absurdly, so a separate cap isn't needed. */
+.topbar {
+  max-width: var(--max-content-width);
+  margin: 0; /* left-aligned, not centered — stays pinned to the true left
+                edge of the page at any window size */
+}
+
+/* =========================================================
+   Decorative coffee cup — bleeds off the top-right corner,
+   same way it does in the screenshot
+   ========================================================= */
+.coffee-decor {
+  position: absolute;
+  top: -64px;
+  right: -64px;
+  width: 240px;
+  height: auto;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* =========================================================
+   Top bar — brand name + nav, plain text
+   ========================================================= */
+.topbar {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--space-4);
+  padding: var(--space-7) var(--space-9) var(--space-5);
+}
+
+.brand {
+  grid-column: 1;
+  justify-self: start;
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.nav {
+  grid-column: 2;
+  justify-self: center;
+  display: flex;
+  gap: var(--space-6);
+}
+
+.nav a {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* =========================================================
+   Games section — case-stack placeholder + card grid
+   ========================================================= */
+.games-layout {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center; /* vertically centers the case-stack between the bottom of the
+                           navbar and the bottom of the screen; .games-grid-wrap opts
+                           back out of this with its own align-self */
+  flex: 1 0 auto; /* fill the remaining viewport height below the navbar, but never
+                      shrink below the content's own natural height */
+  gap: var(--space-7);
+  /* No right/bottom padding: .games-grid-wrap needs to reach the true
+     right edge of the screen to center against it, and no bottom padding
+     keeps the vertical centering symmetric (padding on only one side
+     would skew the midpoint). Left padding stays only so the case-stack's
+     margin-left cancel-trick below has something to cancel back to 0. */
+  padding: 0 0 0 var(--space-9);
+}
+
+/* --- left placeholder stack: PS_Bottom + PS_Top, small offset ---
+   Sized to the same proportions as the box in the draft screenshot
+   (roughly 1 card wide, ~1.9x a card's height) rather than stretched
+   to match the grid, since PS_Top/PS_Bottom are near-square source
+   images and object-fit: cover reshapes them either way. */
+.case-stack {
+  position: relative;
+  width: 240px;
+  aspect-ratio: 172 / 330;
+  flex-shrink: 0;
+  /* In the draft screenshot the stack sits flush against the true page
+     edge, with none of the left inset the header/grid have — pull it
+     back out of .games-layout's padding to match. */
+  margin-left: calc(-1 * var(--space-9));
+  border-radius: var(--radius-card);
+}
+
+.case-stack img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* fill (the default), not cover: PS_Top/PS_Bottom are near-square, and
+     cover would crop away their own right/bottom shadow-border edge to
+     fill this tall box. Stretching keeps that border visible all the way
+     down, which is what produces the stepped/fanned look. Since the
+     border is a flat color the non-uniform stretch doesn't read as
+     distortion. */
+  object-fit: fill;
+  border-radius: var(--radius-card);
+}
+
+.case-stack .ps-bottom {
+  z-index: 1;
+}
+
+.case-stack .ps-top {
+  z-index: 2;
+  transform: translate(-16px, -12px);
+}
+
+/* --- game card grid ---
+   .games-grid-wrap fills the space to the right of the case-stack and
+   horizontally centers .games-grid inside it; .games-grid itself uses a
+   bounded card width (not 1fr) so it has an intrinsic width to center
+   rather than stretching edge-to-edge. */
+.games-grid-wrap {
+  flex: 1;
+  align-self: flex-start; /* opts out of .games-layout's vertical centering —
+                              the grid stays top-aligned under the navbar */
+  display: flex;
+  justify-content: center;
+  min-width: 0;
+}
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(180px, 260px));
+  gap: var(--space-7);
+  align-content: start;
+}
+
+.game-card {
+  display: block;
+}
+
+.game-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+/* =========================================================
+   Responsive — rough pass only; full pass is a later build step (§5)
+   ========================================================= */
+@media (max-width: 1024px) {
+  .games-grid {
+    grid-template-columns: repeat(2, minmax(180px, 260px));
+  }
+}
+
+@media (max-width: 768px) {
+  .topbar {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+    row-gap: var(--space-3);
+    padding: var(--space-5) var(--space-5) var(--space-4);
+  }
+
+  .brand,
+  .nav {
+    grid-column: 1;
+    justify-self: center;
+  }
+
+  .games-layout {
+    flex-direction: column;
+    align-items: center; /* axis flips with the column direction: this now
+                             centers case-stack/grid-wrap horizontally */
+    flex: initial; /* the vertical-centering trick is a desktop thing —
+                       once everything stacks, just flow normally */
+    padding: 0 var(--space-5) var(--space-6);
+  }
+
+  .case-stack {
+    align-self: center;
+    width: 100%;
+    max-width: 220px;
+    margin-left: 0; /* no longer pinned to the true edge once it's stacked
+                        above the grid, centered like everything else */
+  }
+
+  .games-grid-wrap {
+    align-self: stretch;
+    width: 100%;
+  }
+
+  .games-grid {
+    grid-template-columns: repeat(2, minmax(140px, 1fr));
+    gap: var(--space-5);
+  }
+
+  .coffee-decor {
+    width: 160px;
+    top: -40px;
+    right: -40px;
+  }
+}
+
+@media (max-width: 480px) {
+  .games-grid {
+    grid-template-columns: repeat(2, minmax(120px, 1fr));
+    gap: var(--space-4);
+  }
+}
