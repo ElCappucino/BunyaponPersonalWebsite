@@ -413,6 +413,14 @@ img {
 .game-card {
   cursor: pointer;
   display: block;
+  transition: transform 0.15s ease, box-shadow 0.15s ease; /* same
+    hover treatment as .blog-card — lift + soft shadow on hover, see
+    there */
+}
+
+.game-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 16px 16px rgba(0, 0, 0, 0.5);
 }
 
 .games-grid {
@@ -741,8 +749,21 @@ img {
   grid-template-columns: minmax(260px, 340px) 1fr;
   align-items: start;
   gap: var(--space-8);
-  max-width: var(--max-content-width);
-  margin: 0;
+  /* Same side breathing room as the old fixed "margin: 0 300px" on a
+     normal desktop window (~1736px wide, ~300px each side) — but as a
+     max-width + auto margin instead of a hardcoded margin. That pair
+     means the browser computes the side space itself: on a wide
+     screen it's however much is left over past 1140px, split evenly
+     both sides (grows on bigger monitors, same as before); as the
+     window narrows toward 1140px that leftover space shrinks right
+     along with it; once the window IS 1140px there's no space left to
+     give, so from there down the box's own padding below and the
+     ≤900px/≤768px rules further down take over shrinking the content
+     itself. A fixed margin can't do that — it stays 300px even once
+     the window is narrower than the content needs, which is what was
+     pushing everything off-screen. */
+  max-width: 1140px;
+  margin: 0 auto;
   padding: var(--space-3) var(--space-9) var(--space-9);
 }
 
@@ -794,7 +815,7 @@ img {
 
 /* Right column — five stacked sections, same heading style throughout */
 .about-section {
-  margin-bottom: var(--space-7);
+  margin-bottom: var(--space-4);
 }
 
 .about-section:last-child {
@@ -803,24 +824,27 @@ img {
 
 .about-section-title {
   margin: 0 0 var(--space-3);
-  font-size: 20px;
-  font-weight: 700;
+  font-size: 20px; /* -2px */
+  font-weight: 1200;
 }
 
 .about-name {
-  margin: 0;
-  font-weight: 700;
+  margin: 10px 0px 10px 0px;
+  font-size: 18px; /* -2px */
+  font-weight: 1000;
   line-height: 1.4;
 }
 
 .about-role {
   margin: 0 0 var(--space-4);
+  font-size: 14px; /* -2px from the 16px browser default this used to inherit */
   line-height: 1.4;
 }
 
 .about-bio-text,
 .about-text {
   margin: 0 0 var(--space-1);
+  font-size: 14px; /* -2px from the 16px browser default this used to inherit */
   line-height: 1.5;
 }
 
@@ -830,8 +854,7 @@ img {
 
 .about-motto {
   margin: 0;
-  font-weight: 700;
-  font-size: 18px;
+  font-size: 14px; /* -2px */
 }
 
 .about-motto a {
@@ -842,6 +865,8 @@ img {
 .about-list {
   margin: 0;
   padding-left: 20px;
+  font-size: 14px; /* -2px from the 16px browser default this (and .about-sublist,
+    which inherits from it) used to fall back to */
   line-height: 1.6;
 }
 
@@ -857,6 +882,7 @@ img {
   margin: var(--space-2) 0 0;
   padding-left: 20px;
   line-height: 1.6;
+  
 }
 
 .about-sublist li {
@@ -929,8 +955,8 @@ img {
 }
 
 .blog-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+  transform: translateY(-5px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
 }
 
 .blog-card-image {
