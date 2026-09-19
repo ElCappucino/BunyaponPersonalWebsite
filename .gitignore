@@ -1,0 +1,12 @@
+# Debugging screenshots from Claude sessions — not part of the site
+Claude outputs/
+
+# Windows / macOS file-manager junk
+Thumbs.db
+ehthumbs.db
+desktop.ini
+.DS_Store
+
+# Editor settings
+.vscode/
+.idea/
