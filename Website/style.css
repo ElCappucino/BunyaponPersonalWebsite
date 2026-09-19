@@ -722,8 +722,14 @@ img {
    list alone can run past one screen), so it just needs to grow and
    scroll like any normal page — same override the Games page itself
    already falls back to once it stacks on mobile, just applied here at
-   every width via the extra .about-page class on <body>'s .page div. */
-.about-page {
+   every width via the extra class on that page's .page div.
+
+   .page-scroll is the general-purpose name for this: any ordinary
+   scrolling page (the blog posts use it) can opt out of the cap that
+   way. .about-page is kept alongside it only because about.html was
+   built before the generic name existed. */
+.about-page,
+.page-scroll {
   height: auto;
   min-height: 100vh;
 }
@@ -884,6 +890,136 @@ img {
   .about-layout {
     padding: var(--space-2) var(--space-5) var(--space-6);
     gap: var(--space-6);
+  }
+}
+
+/* =========================================================
+   Blog post — a single centred reading column
+
+   The width is the main decision here: measured in ch (the width of
+   a "0" in the current font) rather than pixels, because what makes
+   long text comfortable is how many characters land on a line, not
+   how many pixels. Somewhere around 65-75 is the usual target; much
+   wider and the eye loses its place coming back to the next line.
+   The figures and cover image span the full column, so the pictures
+   stay generous while the text stays narrow.
+   ========================================================= */
+.post-layout {
+  position: relative;
+  z-index: 1;
+  padding: 0 var(--space-5) var(--space-9);
+}
+
+.post {
+  max-width: 68ch;
+  margin: 0 auto;
+}
+
+.post-title {
+  margin: 0 0 var(--space-2);
+  font-size: clamp(24px, 2.6vw, 34px);
+  font-weight: 700;
+  line-height: 1.25;
+  text-align: center;
+}
+
+.post-date {
+  margin: 0 0 var(--space-6);
+  text-align: center;
+  font-size: 14px;
+  opacity: 0.65; /* no muted text color exists in the tokens yet —
+                     DESIGN.md §2 still has --color-text-muted as
+                     [FILL IN] — so this dims the one text tier that
+                     needs it without inventing a second color */
+}
+
+.post-cover {
+  display: block;
+  max-width: 100%;
+  margin: 0 auto var(--space-7);
+  border-radius: var(--radius-card);
+}
+
+.post-body {
+  font-size: 17px;
+  line-height: 1.7;
+}
+
+.post-body h2 {
+  margin: var(--space-7) 0 var(--space-3);
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.post-body h3 {
+  margin: var(--space-6) 0 var(--space-3);
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.post-body h4 {
+  margin: var(--space-5) 0 var(--space-2);
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.post-body p {
+  margin: 0 0 var(--space-4);
+}
+
+.post-body ul,
+.post-body ol {
+  margin: 0 0 var(--space-4);
+  padding-left: 24px;
+}
+
+.post-body li {
+  margin-bottom: var(--space-2);
+}
+
+.post-body a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Figures break out of the text rhythm deliberately — more air above
+   and below than a paragraph gets, so a screenshot reads as its own
+   beat in the post rather than crowding the sentence before it. */
+.post-figure {
+  margin: var(--space-7) 0;
+}
+
+/* max-width rather than width, so a picture smaller than the column
+   (the team photo is only 262px wide) sits at its own size in the
+   middle instead of being blown up past its resolution and going
+   soft. Anything wider than the column still scales down to fit. */
+.post-figure img {
+  display: block;
+  max-width: 100%;
+  margin: 0 auto;
+  border-radius: var(--radius-card);
+}
+
+.post-figure figcaption {
+  margin-top: var(--space-2);
+  text-align: center;
+  font-size: 14px;
+  font-style: italic;
+  opacity: 0.65;
+}
+
+@media (max-width: 768px) {
+  .post-layout {
+    padding: 0 var(--space-5) var(--space-7);
+  }
+
+  .post-body {
+    font-size: 16px;
+  }
+
+  .post-body h2 {
+    font-size: 20px;
   }
 }
 

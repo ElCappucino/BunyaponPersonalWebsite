@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- blog.js replaces this with the post's own title once it knows
+       which post is being shown -->
+  <title>Blog – Bunyapon Chaiongkarn</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- One page serves every blog post. Which one it shows comes from
+       the address — post.html?post=derrick — and the content itself
+       lives in posts.js, so writing a new post never means touching
+       this file. page-scroll turns off the Games page's height cap
+       (see style.css) so a long post scrolls normally. -->
+  <div class="page page-scroll">
+
+    <img class="coffee-decor" src="../Assets/Coffee.png" alt="" aria-hidden="true">
+
+    <header class="topbar">
+      <p class="brand">Bunyapon Chaiongkarn</p>
+      <nav class="nav">
+        <a href="index.html">Games</a>
+        <a href="#" aria-current="page">Blog</a>
+        <a href="about.html">About</a>
+      </nav>
+    </header>
+
+    <main class="post-layout page-content">
+      <article class="post">
+        <h1 class="post-title" id="postTitle"></h1>
+        <p class="post-date" id="postDate"></p>
+        <img class="post-cover" id="postCover" src="" alt="">
+        <div class="post-body" id="postBody"></div>
+      </article>
+    </main>
+
+  </div>
+
+  <script src="pagefade.js" defer></script>
+  <script src="posts.js" defer></script>
+  <script src="blog.js" defer></script>
+</body>
+</html>

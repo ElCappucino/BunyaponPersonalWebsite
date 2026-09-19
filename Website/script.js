@@ -73,7 +73,7 @@
       tools: "Unity Engine",
       itchUrl: "https://elcappu.itch.io/derrick",
       youtubeUrl: "https://www.youtube.com/watch?v=CUNxuDVp4Oc&t=1s",
-      learnMoreUrl: "#",
+      learnMoreUrl: "post.html?post=derrick",
       cdImage: "../Assets/CD/CD_Derrick.png",
       screens: ["../Assets/Screens/Derrick_Image1.png", "../Assets/Screens/Derrick_Image2.png", "../Assets/Screens/Derrick_Image3.png"]
     },
