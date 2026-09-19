@@ -5,15 +5,15 @@
 //
 // TO ADD A POST: copy one whole block below (from "{" to "},"),
 // paste it above this list's closing "];", and edit the text.
-// Newest post goes first — the order here is the order they'll
-// appear once the blog index page exists.
+// Newest post goes first — this order is the order the cards
+// appear in on blog.html.
 //
 //   slug       the short name used in the page's address, e.g.
 //              slug: "derrick" opens at post.html?post=derrick
 //              (lowercase, no spaces — use dashes)
 //   title      the big heading at the top of the post
 //   date       the small line under the title. Any text you like
-//              ("September 2026", "12 Sep 2026"). Leave it as ""
+//              ("August 2025", "12 Sep 2025"). Leave it as ""
 //              to hide the line completely.
 //   cover      the big image under the title, or "" for none
 //   highlights 1-3 short bullet points shown on this post's card on

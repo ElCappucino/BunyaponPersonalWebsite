@@ -1,15 +1,11 @@
 // Fills post.html in with one of the posts from posts.js.
 //
-// Nothing in here needs editing to write a post — posts.js is the
-// file for that. This is the machinery: it works out which post the
-// address bar is asking for, then turns that post's plain-text body
-// into real HTML (headings, paragraphs, lists, images, captions).
-//
+// Nothing here needs editing to write a post — posts.js is the file for that.
 // Which post shows is decided by the address:
 //   post.html?post=derrick   -> the post whose slug is "derrick"
 //   post.html                -> the first post in posts.js
-// The no-name fallback matters because opening post.html straight
-// from the folder (double-clicking it) has no ?post= on the end.
+// The fallback matters because opening post.html straight from the folder has
+// no ?post= on the end.
 (function () {
   var titleEl = document.getElementById("postTitle");
   var dateEl = document.getElementById("postDate");
@@ -17,10 +13,9 @@
   var bodyEl = document.getElementById("postBody");
   if (!titleEl || !bodyEl) return;
 
-  // An image on a line of its own: ![optional caption](file.png)
-  // Declared up here, not down with the converter it belongs to,
-  // because the rendering below runs before that point in the file
-  // and would otherwise reach for it while it's still empty.
+  // An image on a line of its own: ![optional caption](file.png). Declared up
+  // here, not with the converter below, because the rendering runs first and
+  // would otherwise reach for it while it's still empty.
   var IMAGE_LINE = /^!\[([^\]]*)\]\(([^)]+)\)$/;
 
   var posts = typeof POSTS === "undefined" ? [] : POSTS;
@@ -35,9 +30,8 @@
   }
 
   if (!post) {
-    // A link pointing at a post that isn't in posts.js (a typo in the
-    // slug, or a post that was renamed) — say so plainly instead of
-    // leaving a blank page behind.
+    // A link to a post that isn't in posts.js — say so, instead of leaving a
+    // blank page behind.
     document.title = "Post not found – Bunyapon Chaiongkarn";
     titleEl.textContent = "Post not found";
     if (dateEl) dateEl.remove();
@@ -70,14 +64,10 @@
   bodyEl.innerHTML = toHtml(post.body, post.imageBase);
 
   // ==========================================================
-  // The plain-text -> HTML converter.
-  //
-  // This is a deliberately small subset of Markdown — only the
-  // handful of things a devlog actually needs (posts.js lists them
-  // all). Keeping it small is the point: there's no library to
-  // load, nothing to install, and the rules are short enough to
-  // hold in your head. Anything it doesn't recognise is treated as
-  // ordinary text rather than silently disappearing.
+  // The plain-text -> HTML converter: a deliberately small subset of
+  // Markdown, only what a devlog needs (posts.js lists it all). No library
+  // to load, and anything it doesn't recognise stays ordinary text rather
+  // than disappearing.
   // ==========================================================
 
   function toHtml(text, imageBase) {
@@ -133,9 +123,8 @@
   }
 
   function figure(caption, src, imageBase) {
-    // loading="lazy" so the images further down the post are only
-    // fetched as the reader scrolls to them — worth having here,
-    // where a single post can carry ten screenshots and a gif.
+    // loading="lazy": a single post can carry ten screenshots and a gif, so
+    // the ones further down are only fetched as the reader reaches them.
     var html = '<figure class="post-figure"><img src="' +
       escapeHtml(resolveImage(src, imageBase)) + '" alt="' +
       escapeHtml(caption) + '" loading="lazy">';
@@ -143,19 +132,17 @@
     return html + "</figure>";
   }
 
-  // Image names in a post's body are written bare ("team.png") and
-  // looked for in that post's own imageBase folder. Anything that
-  // already looks like a real path or a web address is left alone,
-  // so a one-off image from somewhere else still works.
+  // Image names in a post body are written bare ("team.png") and looked for
+  // in that post's own imageBase folder. Anything that already looks like a
+  // path or a web address is left alone.
   function resolveImage(src, imageBase) {
     if (/^(https?:|data:|\/|\.{1,2}\/)/i.test(src)) return src;
     return (imageBase || "") + src;
   }
 
-  // Text formatting that can appear in the middle of a line. The
-  // escaping happens first, so anything typed in a post is shown as
-  // written and can never turn into live HTML by accident; the tags
-  // added afterwards are the only ones that survive.
+  // Text formatting inside a line. Escaping happens FIRST, so anything typed
+  // in a post is shown as written and can never turn into live HTML by
+  // accident; the tags added afterwards are the only ones that survive.
   function inline(text) {
     return escapeHtml(text)
       .replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, function (whole, label, url) {
@@ -184,9 +171,8 @@
     return line.length > 0;
   }
 
-  // Reading ?post=… straight off the address instead of via
-  // URLSearchParams, because that isn't available when a page is
-  // opened directly from the folder in some older browsers.
+  // Read ?post=… straight off the address rather than via URLSearchParams,
+  // which isn't always available on a page opened directly from the folder.
   function getParam(name) {
     var match = window.location.search.match(
       new RegExp("[?&]" + name + "=([^&]*)")
@@ -195,12 +181,10 @@
   }
 })();
 
-// Blog list page (blog.html) — one card per post, built straight from
-// POSTS in posts.js and in the order it lists them (newest first, per
-// that file's own convention), each one linking to its own post. A
-// separate function from the one above since the two run on different
-// pages — this one just does nothing on post.html, where #blogList
-// doesn't exist, same way the one above does nothing here.
+// Blog list page (blog.html) — one card per post, in the order posts.js
+// lists them, each linking to its own post. Kept separate from the block
+// above since the two run on different pages; each does nothing on the
+// other's page.
 (function () {
   var list = document.getElementById("blogList");
   if (!list) return;

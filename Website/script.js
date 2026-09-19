@@ -1,15 +1,10 @@
 // Grid <-> detail view switching.
 //
-// Only one of #gridView / #detailView is ever actually in the layout —
-// the other carries the `hidden` attribute (real display: none) — so each
-// view can size and align itself independently instead of the two
-// fighting over a shared box (the grid stays pinned under the navbar; the
-// detail panel centers on the remaining viewport height, like the
-// case-stack does). Switching panels is a fade on #gamesStage itself:
-// fade out, swap which panel is hidden, fade back in. The CD-sliding
-// animation on the left is driven the same way and in parallel: .is-open
-// on #caseStack just slides .ps-cd from tucked-under-the-case to
-// peeking-out; the motion itself lives in the CSS transition, not here.
+// Only one of #gridView / #detailView is in the layout at a time (the other
+// carries `hidden`), so each view sizes and aligns itself independently.
+// Switching is a fade on #gamesStage: fade out, swap which panel is hidden,
+// fade back in. The CD slide happens in parallel — .is-open on #caseStack is
+// all this file does; the motion itself is a CSS transition.
 (function () {
   // ==========================================================
   // GAME DETAILS — edit this section to change what shows on a
@@ -29,23 +24,20 @@
   //   tools        "Tools :" value
   //   itchUrl      where the itch.io icon links to
   //   youtubeUrl   where the YouTube icon links to
-  //   learnMoreUrl where the "Learn More" button links to — a
-  //                page on this site (e.g. "derrick.html") once
-  //                one exists, or an outside link for now
+  //   learnMoreUrl where the "Learn More" button links to — a devlog on
+  //                this site ("post.html?post=derrick"), or an
+  //                outside link
   //   cdImage      this game's disc art (from Assets/CD/), shown
   //                once its case is clicked
   //   screens      the 3 gameplay screenshots on the right, in
   //                the order they should appear
   //
-  // Leave a value as "#" for a link that doesn't go anywhere yet
-  // — same as the placeholder text below, safe to click, just
-  // doesn't lead anywhere until a real link replaces it.
+  // Leave a value as "#" for a link that doesn't go anywhere yet.
   //
-  // Each block's key ("yao-ying-yan", "derrick", ...) is the
-  // same data-game id its card carries in index.html — that's
-  // what connects a click on a card to the right block here. The
-  // grid thumbnail image itself (what a card looks like before
-  // it's clicked) is set on that card in index.html, not here.
+  // Each block's key ("yao-ying-yan", "derrick", ...) is the same
+  // data-game id its card carries in index.html — that's what
+  // connects a click on a card to the right block here. The grid
+  // thumbnail itself is set on the card in index.html, not here.
   // ==========================================================
   var GAMES = {
     "yao-ying-yan": {
@@ -159,17 +151,14 @@
   var gridView = document.getElementById("gridView");
   var detailView = document.getElementById("detailView");
   var backLink = document.getElementById("navGames");
-  var caseBackLink = document.getElementById("navBack"); // "Back to select
-    // page", above the case — shown only in detail view, purely via CSS
-    // (.case-stack.is-open .case-back-link in style.css) staying in sync
-    // with the .is-open class toggled below
+  var caseBackLink = document.getElementById("navBack"); // shown only in
+    // detail view, via .is-open in style.css
 
   if (!stage || !caseStack || !gridView || !detailView) return;
 
-  // Elements inside #detailView that populateDetail() below fills in from
-  // a GAMES entry. The meta <dd>s are matched by their own data-field
-  // (see index.html) rather than by position, so reordering the meta list
-  // there someday can't silently scramble which value lands where.
+  // Elements populateDetail() fills in from a GAMES entry. The meta <dd>s are
+  // matched by their own data-field rather than by position, so reordering
+  // the list in index.html can't scramble which value lands where.
   var detailTitle = detailView.querySelector(".detail-title");
   var detailDate = detailView.querySelector(".detail-date");
   var detailDesc = detailView.querySelector(".detail-desc");
@@ -178,9 +167,8 @@
   var detailYoutubeLink = detailView.querySelector('.icon-link[aria-label="YouTube"]');
   var detailLearnMoreLink = detailView.querySelector(".btn-learn-more");
   var detailScreenImgs = detailView.querySelectorAll(".detail-screens img");
-  var caseCdImg = caseStack.querySelector(".ps-cd"); // the floating disc
-    // prop — not inside #detailView, so it isn't covered by the
-    // detailView-scoped querySelectors above
+  var caseCdImg = caseStack.querySelector(".ps-cd"); // outside #detailView,
+    // so not covered by the queries above
 
   function populateDetail(game) {
     if (!game) return;
@@ -199,27 +187,18 @@
     });
     if (caseCdImg && game.cdImage) {
       caseCdImg.src = game.cdImage;
-      restartCdSpin(caseCdImg); // so the new disc always starts its slow
-        // spin (see style.css's cd-spin) from the same angle, rather than
-        // picking up wherever the last game's rotation happened to be —
-        // safe to do here since the CD is still off-screen at this point
-        // (see the comment on populateDetail's caller), same as the src
-        // swap just above it
+      restartCdSpin(caseCdImg); // so each disc starts its spin from the same
+        // angle instead of picking up the last one's rotation
     }
   }
 
-  // A CSS animation keeps running (and keeps its own clock) for as long as
-  // an element matches the rule that applies it — style.css's cd-spin
-  // rule applies unconditionally, so on its own it would never restart,
-  // just keep looping from whenever the page first loaded. Briefly
-  // removing the animation, forcing the browser to notice (offsetHeight —
-  // reading layout forces it to apply the style change immediately
-  // instead of batching it), then handing the animation back is the
-  // standard way to make a CSS animation start over from its first frame.
+  // Removing the animation, forcing the browser to notice (reading
+  // offsetHeight applies the change immediately rather than batching it),
+  // then handing it back is the standard way to restart a CSS animation
+  // from its first frame.
   function restartCdSpin(el) {
     el.style.animation = "none";
-    // eslint-disable-next-line no-unused-expressions
-    el.offsetHeight;
+    el.offsetHeight; // forces layout — deliberate, not a stray statement
     el.style.animation = "";
   }
 
@@ -231,8 +210,7 @@
 
     window.setTimeout(function () {
       if (showDetail) {
-        populateDetail(game); // swap the content in while opacity: 0, so
-                               // the change itself is never visible
+        populateDetail(game); // swapped in at opacity 0, so it's never seen
         gridView.hidden = true;
         gridView.setAttribute("inert", "");
         detailView.hidden = false;
@@ -247,17 +225,15 @@
         stage.classList.remove("is-detail");
         caseStack.classList.remove("is-open");
       }
-      // Force layout before removing is-fading, so the fade-back-in
-      // actually transitions instead of the browser coalescing both
-      // opacity changes into one frame.
-      // eslint-disable-next-line no-unused-expressions
+      // Force layout before removing is-fading, so the fade back in actually
+      // transitions instead of both opacity changes being coalesced into one
+      // frame.
       stage.offsetHeight;
       stage.classList.remove("is-fading");
     }, FADE_MS);
   }
 
-  // Each card's data-game (set in index.html) looks up its info in GAMES
-  // above; populateDetail() fills #detailView with it as part of the fade.
+  // Each card's data-game (set in index.html) looks up its info in GAMES.
   document.querySelectorAll(".game-card").forEach(function (card) {
     card.addEventListener("click", function (e) {
       e.preventDefault();
@@ -265,9 +241,8 @@
     });
   });
 
-  // "Games" in the nav, and "Back to select page" above the case in detail
-  // view, both do the same thing: back to the grid, instead of reloading
-  // index.html.
+  // "Games" in the nav and "Back to select page" both return to the grid in
+  // place, instead of reloading index.html.
   [backLink, caseBackLink].forEach(function (link) {
     if (!link) return;
     link.addEventListener("click", function (e) {

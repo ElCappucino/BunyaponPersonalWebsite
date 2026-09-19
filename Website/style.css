@@ -1,7 +1,5 @@
 /* =========================================================
-   Tokens — from DESIGN.md §2 (draft values, pixel-sampled
-   from DraftScreenshot/Home_SelectGame.png + Home_ShowGame.png,
-   not yet confirmed against Figma Dev Mode — see §7)
+   Tokens — see DESIGN.md §2
    ========================================================= */
 :root {
   --color-bg:        #EEE4DD;
@@ -51,41 +49,18 @@ img {
 
 .page {
   position: relative;
-  overflow-x: hidden; /* lets the coffee cup bleed off the true browser edge, at any width,
-                          without a horizontal scrollbar */
-  height: 100vh; /* NOT min-height: a flex container that's only min-height-constrained
-                     will happily grow taller than the viewport to fit whichever child
-                     needs more room — which is exactly what let .games-layout (and the
-                     case-stack centered inside it) end up a different height in grid
-                     view (3 rows of cards) vs detail view, and "snap" when switching.
-                     Pinning .page itself to exactly 100vh gives .games-layout's
-                     flex-shrink something to actually shrink against (see there) so it
-                     settles at the same height in both views; the desktop:mobile split
-                     doesn't need this hard cap at all (mobile content is simply allowed
-                     to overflow past it — see .games-layout's mobile override below —
-                     so the page still scrolls normally there, same as before). */
+  overflow-x: hidden; /* lets the coffee cup bleed off the browser edge without
+                          a horizontal scrollbar */
+  height: 100vh; /* a hard cap, NOT min-height: .games-layout below shrinks against
+                    it so the case-stack centres at the same height in both the grid
+                    and detail views. Ordinary scrolling pages opt out with
+                    .page-scroll. */
   display: flex;
-  flex-direction: column; /* topbar keeps its natural height; games-layout (flex: 1 0 auto)
-                              fills everything below it, so the case-stack can be centered
-                              in the true remaining viewport height without hardcoding the
-                              navbar's height anywhere */
-}
-
-/* The header keeps a soft width ceiling so the nav doesn't drift too far
-   from the brand on huge monitors. .games-layout is intentionally NOT
-   capped here any more — the grid needs to reach the true right edge of
-   the screen for .games-grid-wrap to center against it, and the grid's
-   own minmax() column sizing already stops individual cards from
-   stretching absurdly, so a separate cap isn't needed. */
-.topbar {
-  max-width: var(--max-content-width);
-  margin: 0; /* left-aligned, not centered — stays pinned to the true left
-                edge of the page at any window size */
+  flex-direction: column;
 }
 
 /* =========================================================
-   Decorative coffee cup — bleeds off the top-right corner,
-   same way it does in the screenshot
+   Decorative coffee cup — bleeds off the top-right corner
    ========================================================= */
 .coffee-decor {
   position: absolute;
@@ -107,6 +82,9 @@ img {
   grid-template-columns: 1fr auto 1fr;
   align-items: center;
   gap: var(--space-4);
+  max-width: var(--max-content-width); /* stops the nav drifting away from the
+                                          brand on very wide monitors */
+  margin: 0; /* left-aligned, not centred */
   padding: var(--space-7) var(--space-9) var(--space-5);
 }
 
@@ -143,69 +121,41 @@ img {
   position: relative;
   z-index: 1;
   display: flex;
-  align-items: center; /* vertically centers the case-stack between the bottom of the
-                           navbar and the bottom of the screen; .games-grid-wrap opts
-                           back out of this with its own align-self */
-  flex: 1 1 auto; /* fill the remaining viewport height below the navbar — but ALSO
-                      allow shrinking back down to that same remaining height (see
-                      min-height/overflow-y below), instead of being forced taller
-                      by whichever view's content happens to be bigger */
-  min-height: 0; /* without this, a flex item's automatic minimum size is its
-                     content's own height — so once the grid had enough cards to
-                     be taller than the screen, THIS box (not just the grid) grew
-                     past the viewport to fit it, while the shorter detail view
-                     left it exactly viewport height. The case-stack is centered
-                     within THIS box, so it re-centered against a different height
-                     every time the view switched — the "snap". min-height: 0 lets
-                     the box shrink back down to the remaining-viewport height in
-                     both views alike; overflow-y below is what makes that safe. */
-  overflow-y: auto; /* once shrunk to the remaining viewport height, a view whose
-                        content is taller (the grid, with enough cards) scrolls
-                        inside this box instead of being clipped — so nothing is
-                        lost, it just scrolls here instead of the whole page. */
-  scrollbar-gutter: stable; /* reserves the scrollbar's width whether or not it's
-                                actually showing, so switching between a view that
-                                needs to scroll (grid) and one that doesn't
-                                (detail) doesn't ALSO shift everything sideways. */
+  align-items: center; /* centres the case-stack in the space below the navbar */
+  flex: 1 1 auto;
+  min-height: 0; /* lets this box shrink back to the remaining viewport height
+                    rather than growing to fit whichever view is taller — that
+                    difference is what made the case-stack jump between views */
+  overflow-y: auto; /* so a taller view (the grid) scrolls inside this box
+                       instead of being clipped by the shrink above */
+  scrollbar-gutter: stable; /* reserve the scrollbar's width either way, so
+                               views of different heights don't shift sideways */
   gap: var(--space-7);
-  /* No right/bottom padding: .games-grid-wrap needs to reach the true
-     right edge of the screen to center against it, and no bottom padding
-     keeps the vertical centering symmetric (padding on only one side
-     would skew the midpoint). Left padding stays only so the case-stack's
-     margin-left cancel-trick below has something to cancel back to 0. */
+  /* No right/bottom padding: the grid needs to reach the true right edge to
+     centre against it, and padding on one side only would skew the vertical
+     midpoint. Left padding stays for .case-stack's negative margin to cancel. */
   padding: 0 0 0 var(--space-9);
 
-  /* Shared with .case-stack's width and .detail-screens' width below, so
-     .detail-info's own width (further down) can be computed from them —
-     see the big comment on .detail-info for why. */
+  /* Shared with .case-stack and .detail-screens so .detail-info's width can be
+     computed from them — see there. */
   --case-w: clamp(220px, 20vw, 300px);
   --screens-w: clamp(210px, 23vw, 340px);
-  /* .case-stack.is-open .ps-cd's width + left (both %s of the case),
-     i.e. how far the open CD's right edge reaches past the case's own
-     left edge, as a multiple of the case's width. Overridden to match
-     the smaller-CD breakpoint below 1150px. */
+  /* How far the open CD reaches past the case's left edge, as a multiple of the
+     case's width (its own width % + left %). */
   --cd-reach: 1.99;
 }
 
-/* --- left placeholder stack: PS_Bottom + PS_Top, small offset ---
-   Sized to the same proportions as the box in the draft screenshot
-   (roughly 1 card wide, ~1.9x a card's height) rather than stretched
-   to match the grid, since PS_Top/PS_Bottom are near-square source
-   images and object-fit: cover reshapes them either way. */
+/* --- left placeholder stack: PS_Bottom + PS_Top, small offset --- */
 .case-stack {
   position: relative;
   z-index: 1;
-  /* The draft screenshots show the SAME box size in both the grid and the
-     detail view — it never shrinks or grows when a card is opened, only
-     the CD slides out from inside it — so this is the one size for both
-     states. clamp() lets it scale a little with viewport width instead
-     of staying pixel-locked at every resolution. */
+  /* One size for both views — opening a card only slides the CD out, the box
+     itself never changes size. clamp() lets it scale with the viewport. */
   width: var(--case-w);
   aspect-ratio: 172 / 330;
   flex-shrink: 0;
-  /* In the draft screenshot the stack sits flush against the true page
-     edge, with none of the left inset the header/grid have — pull it
-     back out of .games-layout's padding to match. */
+  /* Sits flush against the true page edge, so pull it back out of
+     .games-layout's left padding. */
   margin-left: calc(-1 * var(--space-9));
   border-radius: var(--radius-card);
 }
@@ -215,26 +165,18 @@ img {
   inset: 0;
   width: 100%;
   height: 100%;
-  /* fill (the default), not cover: PS_Top/PS_Bottom are near-square, and
-     cover would crop away their own right/bottom shadow-border edge to
-     fill this tall box. Stretching keeps that border visible all the way
-     down, which is what produces the stepped/fanned look. Since the
-     border is a flat color the non-uniform stretch doesn't read as
+  /* fill, not cover: PS_Top/PS_Bottom are near-square, and cover would crop
+     away their own border edge — which is what gives the stack its fanned
+     look. The border is a flat colour, so stretching doesn't read as
      distortion. */
   object-fit: fill;
   border-radius: var(--radius-card);
 }
 
-/* "Back to select page" — sits right above the case (bottom: 100% anchors
-   it to .case-stack's own top edge, so it tracks the case's width/position
-   at any viewport size without a hand-picked offset), left-aligned with
-   the case's left edge. Hidden by default and shown only once the case is
-   "open" (detail view) — .is-open is toggled in script.js in the same
-   step as everything else that switches between grid and detail, so this
-   appears/disappears in sync with the rest of the swap. display: none
-   (not just opacity/visibility) also keeps it out of the tab order and
-   off screen readers' radar while the grid is showing, with no extra
-   inert/hidden bookkeeping needed. */
+/* "Back to select page" — anchored to .case-stack's own top edge
+   (bottom: 100%), so it tracks the case at any viewport size. Shown only once
+   the case is open, via .is-open (toggled in script.js). display: none rather
+   than opacity also keeps it out of the tab order while the grid is showing. */
 .case-back-link {
   display: none;
   position: absolute;
@@ -260,11 +202,8 @@ img {
   flex-shrink: 0;
 }
 
-/* Fixed layer order, always — this never changes between the closed and
-   open state: ps-top is always the front card, ps-cd always rides in the
-   middle (sandwiched between the two case layers, never in front of
-   ps-top), ps-bottom is always the back card. Only ps-cd's horizontal
-   position animates; nothing about the stacking order does. */
+/* Fixed layer order: ps-top in front, ps-cd in the middle, ps-bottom behind.
+   Only ps-cd's horizontal position animates; the stacking never changes. */
 .case-stack .ps-bottom {
   z-index: 1;
 }
@@ -278,41 +217,23 @@ img {
   transform: translate(-16px, -12px);
 }
 
-/* --- the CD: slides left-to-right from tucked-under-the-case to peeking
-   out past its right edge, in .case-stack.is-open. It stays the middle
-   layer throughout (see above) — ps-top still overlaps its top-left, so
-   the disc reads as sliding OUT from behind the case, not popping in
-   front of it. PS_CD.png is a circular cutout on a square-ish canvas
-   with a little transparent padding below the circle — object-fit: cover
-   + a 1:1 box crops that padding away so the box hugs the actual disc.
-
-   Sizing: in the draft screenshot the CD's diameter is close to the
-   case's full HEIGHT, not its width — a circle that size is necessarily
-   much wider than the (narrow, portrait) case itself, about 1.8x its
-   width. `left` (a % of the case, its containing block) rather than
-   `transform: translateX()` (a % of the CD's OWN width) drives the
-   horizontal slide, since that's the axis we're reasoning about here;
-   `top: 50%` + `transform: translateY(-50%)` still centers it vertically. */
+/* --- the CD: slides out from behind the case in .case-stack.is-open, staying
+   the middle layer throughout, so it reads as sliding OUT rather than popping
+   in front. PS_CD.png is a circle on a squarish canvas with transparent
+   padding, so object-fit: cover on a 1:1 box crops down to the disc itself.
+   Its diameter is close to the case's HEIGHT, so it's far wider than the
+   (narrow, portrait) case. `left` drives the slide — a % of the case, which
+   is what we're positioning against, rather than translateX's % of the disc. */
 .case-stack .ps-cd {
   position: absolute;
-  left: -183%; /* closed: fully off the case's left edge, so nothing peeks
-                  past the right edge into view — matches the draft grid
-                  screenshot, where no CD shows at all */
+  left: -183%; /* closed: fully off the case's left edge, nothing peeking */
   top: 50%;
   width: 177%; /* diameter ~= a little less than the case's height */
-  max-width: none; /* the global `img { max-width: 100% }` rule would
-                       otherwise silently cap this back down to the
-                       case's own width, since percentages on both
-                       properties resolve against the same containing
-                       block and max-width always wins over width */
-  height: auto; /* .case-stack img below sets height: 100%, which — since
-                   width is also a definite value here — leaves
-                   aspect-ratio nothing to compute and no effect: the box
-                   ends up the right width but the full case-stack's
-                   height, and border-radius: 50% on THAT draws an
-                   ellipse, not a circle. height: auto hands the vertical
-                   size back to aspect-ratio, so the disc scales evenly in
-                   both directions and always stays round. */
+  max-width: none; /* the global `img { max-width: 100% }` would otherwise cap
+                      this back down to the case's own width */
+  height: auto; /* hands the vertical size back to aspect-ratio — with
+                   .case-stack img's height: 100% the box would take the case's
+                   full height and border-radius: 50% would draw an ellipse */
   aspect-ratio: 1 / 1;
   object-fit: cover;
   object-position: top;
@@ -322,22 +243,16 @@ img {
 }
 
 .case-stack.is-open .ps-cd {
-  /* Peeks out past the case's right edge by roughly the same amount as
-     the draft screenshot — a big peek now that the disc itself is much
-     bigger, but still short of .games-stage (case-stack width + the row
-     gap away), so it doesn't reach into the detail text. */
+  /* A big peek, but still short of .games-stage, so it never reaches into
+     the detail text. */
   left: 22%;
 }
 
-/* Slow continuous spin, like a record turning — runs all the time, not
-   just while open (it's simplest and costs nothing while the disc is
-   tucked out of sight behind the case). translateY(-50%) has to be
-   repeated in every keyframe rather than left on the `transform` above:
-   once an animation targets a property, its keyframes are the ONLY
-   source of that property's value while it runs, so if they didn't
-   include translateY(-50%) too, the disc would jump out of vertical
-   center the instant the spin started. Gated behind prefers-reduced-motion
-   so it's off entirely for anyone who's asked their OS to limit motion. */
+/* Slow continuous spin, like a record turning. translateY(-50%) has to be
+   repeated in the keyframes: once an animation targets `transform`, its
+   keyframes are the only source of that property while it runs, so leaving it
+   out would drop the disc out of vertical centre. Off entirely for anyone
+   who's asked their OS to limit motion. */
 @media (prefers-reduced-motion: no-preference) {
   .case-stack .ps-cd {
     animation: cd-spin 12s linear infinite;
@@ -354,20 +269,14 @@ img {
 }
 
 /* --- game card grid / game detail ---
-   .games-stage fills the space to the right of the case-stack. Only one
-   of .games-grid-wrap / .game-detail is ever in the layout at a time (the
-   other has the `hidden` attribute), so each can have its own alignment
-   and sizing without the two fighting over shared box dimensions — the
-   grid stays pinned under the navbar, the detail panel centers on the
-   remaining viewport height like the case-stack does. Switching is a
-   plain fade on .games-stage itself, timed in script.js: fade out, swap
-   which panel is hidden, fade back in. */
+   Only one of .games-grid-wrap / .game-detail is in the layout at a time (the
+   other carries `hidden`), so each sizes and aligns itself independently: the
+   grid stays pinned under the navbar, the detail panel centres on the
+   remaining height. Switching is a fade on .games-stage, timed in script.js. */
 .games-stage {
   position: relative;
-  z-index: 2; /* explicitly above .case-stack's z-index: 1 — the detail
-                 text needs to stay legible over the CD where the two
-                 overlap, and an explicit value here removes any
-                 ambiguity about DOM-order-based stacking. */
+  z-index: 2; /* above .case-stack, so the detail text stays legible where the
+                 two overlap */
   flex: 1;
   align-self: flex-start; /* grid view: top-aligned under the navbar */
   min-width: 0;
@@ -384,13 +293,10 @@ img {
   opacity: 0;
 }
 
-/* `.games-grid-wrap { display: flex }` / `.game-detail { flex-direction:
-   row }` below are author rules, so they'd win over the browser's default
-   `[hidden] { display: none }` even though that looks like it should be
-   more specific — author styles beat the user-agent stylesheet outright.
-   Spelling it out again here (on the ids, so it also wins over the class
-   rules below in specificity, not just origin) is what actually lets
-   script.js's hidden/inert toggling take a panel out of the layout. */
+/* Author rules beat the browser's own `[hidden] { display: none }`, so the
+   display values below would keep a "hidden" panel visible. Restating it here
+   on the ids is what lets script.js's hidden toggling actually take a panel
+   out of the layout. */
 #gridView[hidden],
 #detailView[hidden] {
   display: none;
@@ -413,13 +319,14 @@ img {
 .game-card {
   cursor: pointer;
   display: block;
-  transition: transform 0.15s ease, box-shadow 0.15s ease; /* same
-    hover treatment as .blog-card — lift + soft shadow on hover, see
-    there */
+  /* cubic-bezier(0.34, 1.56, 0.64, 1) is the usual CSS stand-in for spring
+     physics: the 1.56 overshoots past the hover transform before settling
+     back, which is the bounce. The shadow just fades, on its own curve. */
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.15s ease;
 }
 
 .game-card:hover {
-  transform: translateY(-10px);
+  transform: translateY(-10px) rotate(6deg);
   box-shadow: 0 16px 16px rgba(0, 0, 0, 0.5);
 }
 
@@ -436,23 +343,14 @@ img {
   height: auto;
 }
 
-/* --- game detail panel: info column (title/date/desc/meta/actions)
-   + a column of stacked gameplay screenshots pinned to the true right
-   edge of the page ---
-   `width: fit-content` + `margin-left: auto` is what does the pinning
-   (NOT `justify-content: space-between` — with .detail-info's width
-   capped by max-width, `space-between` on a `width: 100%` flex container
-   leaves a leftover "dead zone" that isn't claimed by either the `gap`
-   or `padding-right` value, so the two visible gaps end up unequal in
-   practice, worse the wider the window gets). Shrinking the box to its
-   content and pushing it right with auto margin means `gap` (text →
-   screenshots) and `padding-right` (screenshots → true edge) are the
-   ONLY things producing space, so setting them to the same token makes
-   the two gaps genuinely, robustly equal at any viewport width. Sizes
-   use clamp() so both the text/button and the screenshots scale with
-   viewport width instead of staying a fixed px size at every resolution
-   — bounds are a reasonable read of the Home_ShowGame draft, not a
-   Dev-Mode-confirmed spec (same caveat as the rest of §2). */
+/* --- game detail panel: info column + a column of stacked screenshots,
+   pinned to the true right edge of the page ---
+   `width: fit-content` + `margin-left: auto` does the pinning rather than
+   `justify-content: space-between`, so that `gap` (text → screenshots) and
+   `padding-right` (screenshots → edge) are the only things producing space —
+   which is what makes the two visible gaps genuinely equal at any width.
+   clamp() lets the text and screenshots scale with the viewport rather than
+   staying pixel-locked. */
 .game-detail {
   display: flex;
   flex-direction: row;
@@ -460,30 +358,18 @@ img {
   width: fit-content;
   margin-left: auto;
   gap: var(--space-7);
-  /* Same value as the `gap` above, on purpose: the gap between the
-     description text and the screenshots should match the gap between
-     the screenshots and the true right edge, not just "some" margin. */
+  /* Same token as the gap above, on purpose — text→screenshots should match
+     screenshots→edge. */
   padding-right: var(--space-7);
 }
 
-/* .detail-info's width is computed, not just clamped, so the gap between
-   the CD and the text (an otherwise-empty leftover space, since
-   .game-detail is pinned to the true right edge — see its own comment)
-   comes out equal to the gap between the text and the screenshots,
-   rather than being whatever's left over. Working from the right edge
-   inward: .game-detail's left edge sits at (100vw - its own width), and
-   we want that to land exactly --space-7 past the CD's right edge
-   (case width × --cd-reach). Solving for .detail-info's width given
-   .game-detail's width = info + gap + screens + padding-right (all
-   --space-7) leaves 100vw − (case × reach) − screens − 3×(--space-7).
-   clamp() keeps it from going unreasonably narrow on small viewports,
-   and caps it at 880px so paragraph lines don't stretch unreadably long
-   on very wide monitors — the two gaps stay exactly equal up to roughly
-   a 1920px-wide window (comfortably past DESIGN.md's 1440px target and
-   common real laptop/monitor widths); past that the cap wins and the
-   CD-side gap grows again rather than the text. See .detail-title etc.
-   below for the matching font-size growth ("scale the text") that makes
-   a wider box actually get used rather than just adding blank space. */
+/* Computed rather than just clamped, so the leftover gap between the CD and
+   the text comes out equal to the gap between the text and the screenshots.
+   Working inward from the right edge: .game-detail's left edge sits at
+   100vw minus its own width, and that should land --space-7 past the CD's
+   right edge (case width × --cd-reach). clamp() keeps it from going too
+   narrow on small viewports and caps the line length at 880px on wide ones;
+   past ~1920px the cap wins and the CD-side gap grows instead. */
 .detail-info {
   flex: none;
   min-width: 0;
@@ -578,17 +464,12 @@ img {
 }
 
 /* =========================================================
-   Responsive — rough pass only; full pass is a later build step (§5)
+   Responsive
    ========================================================= */
 
-/* Below ~1050px the open detail panel's text/screenshots no longer have
-   slack space to sit clear of the case — .game-detail's own min-content
-   width fills the rest of .games-stage exactly, flush against the gap
-   after .case-stack, so the big design-ratio CD (diameter ~= the case's
-   height) would run straight into the text. Falling back to a smaller,
-   shorter peek here (closer to the case's own width, not its height)
-   keeps the CD clear of the text through the rest of the desktop range,
-   down to the 768px mobile breakpoint. */
+/* Below ~1050px the detail panel has no slack left to sit clear of the case,
+   so the full-size CD (diameter ≈ the case's height) would run into the text.
+   Fall back to a smaller, shorter peek for the rest of the desktop range. */
 @media (max-width: 1150px) {
   .games-layout {
     --cd-reach: 1.22; /* matches the smaller CD's width (94%) + left (28%) below */
@@ -627,25 +508,17 @@ img {
 
   .games-layout {
     flex-direction: column;
-    align-items: center; /* axis flips with the column direction: this now
-                             centers case-stack/grid-wrap horizontally */
-    flex: initial; /* the vertical-centering trick is a desktop thing —
-                       once everything stacks, just flow normally */
-    min-height: auto; /* undo the desktop centering-stability trick above —
-                          mobile stacks everything in normal flow and should
-                          scroll with the whole page, not in its own nested
-                          box */
+    align-items: center; /* the axis flips with the column direction, so this
+                            now centres things horizontally */
+    flex: initial;
+    min-height: auto; /* the desktop centring trick doesn't apply once
+                         everything stacks — just flow and scroll normally */
     overflow-y: visible;
     padding: 0 var(--space-5) var(--space-6);
   }
 
-  /* .page's own height: 100vh cap (see there) is what gives .games-layout
-     something concrete to shrink against on desktop — needed only for the
-     side-by-side case-stack/grid layout above. Once everything stacks in
-     one column there's nothing to center against a shrinking sibling, so
-     undo the cap here too: .page (and with it the whole document) grows
-     to fit the stacked content again, and the browser's normal page
-     scrollbar takes over, same as before this fix. */
+  /* Nothing to centre against once everything stacks in one column, so drop
+     .page's height cap and let the document scroll normally again. */
   .page {
     height: auto;
     min-height: 100vh;
@@ -655,15 +528,12 @@ img {
     align-self: center;
     width: 100%;
     max-width: 220px;
-    margin-left: 0; /* no longer pinned to the true edge once it's stacked
-                        above the grid, centered like everything else */
+    margin-left: 0; /* no longer pinned to the page edge once it's stacked */
   }
 
-  /* Only in detail view (once .case-back-link is actually showing) —
-     stacked this close under the nav, "Back to select page" (sitting
-     just above the case via bottom: 100%) would otherwise overlap it.
-     Scoped to .is-open so the grid view doesn't waste this space when
-     the link isn't there to make room for. */
+  /* Stacked this close under the nav, "Back to select page" (which sits just
+     above the case) would otherwise overlap it. Scoped to .is-open so the grid
+     view doesn't reserve space for a link that isn't showing. */
   .case-stack.is-open {
     margin-top: var(--space-7);
   }
@@ -683,18 +553,13 @@ img {
     flex-direction: column;
     align-items: center;
     text-align: center;
-    width: 100%; /* undo the desktop fit-content sizing so the column
-                     fills the centered mobile layout instead of
-                     shrink-wrapping to its content width */
-    margin-left: 0; /* undo the desktop right-pinning auto margin */
-    padding-right: 0; /* the desktop right inset would just skew the
-                          centered stack sideways once it's a single
-                          column */
+    width: 100%;
+    margin-left: 0;
+    padding-right: 0;
   }
 
   .detail-info {
-    width: 100%; /* override the desktop calc() — there's no CD-gap to
-                     balance once the layout stacks into a single column */
+    width: 100%; /* no CD-gap to balance once it's a single column */
   }
 
   .detail-actions {
@@ -724,19 +589,9 @@ img {
    About page — photo/skills column + bio column
    ========================================================= */
 
-/* .page's height: 100vh cap (see there) exists only to stabilize the
-   Games page's side-by-side case-stack/grid centering trick. The About
-   page has no such trick and plenty of ordinary content (the Achievements
-   list alone can run past one screen), so it just needs to grow and
-   scroll like any normal page — same override the Games page itself
-   already falls back to once it stacks on mobile, just applied here at
-   every width via the extra class on that page's .page div.
-
-   .page-scroll is the general-purpose name for this: any ordinary
-   scrolling page (the blog posts use it) can opt out of the cap that
-   way. .about-page is kept alongside it only because about.html was
-   built before the generic name existed. */
-.about-page,
+/* .page's height cap exists only for the Games page's centring trick. Any
+   ordinary scrolling page — About, the blog, a post — opts out with this
+   class on its .page div. */
 .page-scroll {
   height: auto;
   min-height: 100vh;
@@ -749,19 +604,10 @@ img {
   grid-template-columns: minmax(260px, 340px) 1fr;
   align-items: start;
   gap: var(--space-8);
-  /* Same side breathing room as the old fixed "margin: 0 300px" on a
-     normal desktop window (~1736px wide, ~300px each side) — but as a
-     max-width + auto margin instead of a hardcoded margin. That pair
-     means the browser computes the side space itself: on a wide
-     screen it's however much is left over past 1140px, split evenly
-     both sides (grows on bigger monitors, same as before); as the
-     window narrows toward 1140px that leftover space shrinks right
-     along with it; once the window IS 1140px there's no space left to
-     give, so from there down the box's own padding below and the
-     ≤900px/≤768px rules further down take over shrinking the content
-     itself. A fixed margin can't do that — it stays 300px even once
-     the window is narrower than the content needs, which is what was
-     pushing everything off-screen. */
+  /* max-width + auto margins rather than a fixed side margin, so the browser
+     works the side space out itself: whatever's left over past 1140px, split
+     evenly, shrinking to nothing as the window narrows to 1140px. Below that,
+     the padding here and the ≤900px/≤768px rules shrink the content. */
   max-width: 1140px;
   margin: 0 auto;
   padding: var(--space-3) var(--space-9) var(--space-9);
@@ -824,27 +670,27 @@ img {
 
 .about-section-title {
   margin: 0 0 var(--space-3);
-  font-size: 20px; /* -2px */
+  font-size: 20px;
   font-weight: 1200;
 }
 
 .about-name {
   margin: 10px 0px 10px 0px;
-  font-size: 18px; /* -2px */
+  font-size: 18px;
   font-weight: 1000;
   line-height: 1.4;
 }
 
 .about-role {
   margin: 0 0 var(--space-4);
-  font-size: 14px; /* -2px from the 16px browser default this used to inherit */
+  font-size: 14px;
   line-height: 1.4;
 }
 
 .about-bio-text,
 .about-text {
   margin: 0 0 var(--space-1);
-  font-size: 14px; /* -2px from the 16px browser default this used to inherit */
+  font-size: 14px;
   line-height: 1.5;
 }
 
@@ -854,7 +700,7 @@ img {
 
 .about-motto {
   margin: 0;
-  font-size: 14px; /* -2px */
+  font-size: 14px;
 }
 
 .about-motto a {
@@ -865,8 +711,7 @@ img {
 .about-list {
   margin: 0;
   padding-left: 20px;
-  font-size: 14px; /* -2px from the 16px browser default this (and .about-sublist,
-    which inherits from it) used to fall back to */
+  font-size: 14px; /* .about-sublist inherits this */
   line-height: 1.6;
 }
 
@@ -882,7 +727,6 @@ img {
   margin: var(--space-2) 0 0;
   padding-left: 20px;
   line-height: 1.6;
-  
 }
 
 .about-sublist li {
@@ -910,9 +754,6 @@ img {
 }
 
 @media (max-width: 768px) {
-  /* .coffee-decor's own shrink at this width is already handled by the
-     Games page's ≤768px block above (that rule isn't scoped to the games
-     layout, so it applies here too) — nothing extra needed for it. */
   .about-layout {
     padding: var(--space-2) var(--space-5) var(--space-6);
     gap: var(--space-6);
@@ -922,13 +763,10 @@ img {
 /* =========================================================
    Blog list — one card per post
 
-   Cards are a fixed max-width column, not a grid — reads the same as
-   a Medium-style feed, and it's what the mock-up shows. A card's own
-   background is a warm off-white, [ESTIMATED] by eye from the
-   mock-up rather than sampled: no dedicated card-surface token
-   exists yet in DESIGN.md §2 (--color-surface is the cooler grey
-   already used for the games-page tag bar — a different tone, not
-   this one). Re-sample against Figma if that ever exists.
+   A single max-width column rather than a grid, so it reads like an ordinary
+   feed. The card background is a warm off-white picked by eye — there's no
+   card-surface token yet (--color-surface is the cooler grey the games page
+   uses).
    ========================================================= */
 .blog-layout {
   position: relative;
@@ -949,8 +787,7 @@ img {
   align-items: stretch;
   background: #FBF6EA;
   border-radius: var(--radius-card);
-  overflow: hidden; /* clips the image to the card's own rounded
-                        corners instead of squaring off its outer edge */
+  overflow: hidden; /* clips the image to the card's rounded corners */
   transition: transform 0.15s ease, box-shadow 0.15s ease;
 }
 
@@ -992,9 +829,8 @@ img {
 }
 
 .blog-card-date {
-  /* auto top margin pins this to the bottom of the card regardless
-     of how many highlight bullets came before it, so the date lines
-     up across cards with a different number of bullets each */
+  /* auto top margin pins this to the bottom of the card, so dates line up
+     across cards with different numbers of bullets */
   margin: auto 0 0;
   font-size: 13px;
   font-weight: 700;
@@ -1002,8 +838,7 @@ img {
 
 @media (max-width: 620px) {
   .blog-card {
-    /* a 250px side image has no room left on a phone-width card —
-       stack it on top of the text instead of squeezing it thinner */
+    /* a 250px side image leaves no room on a phone-width card */
     flex-direction: column;
   }
 
@@ -1016,12 +851,9 @@ img {
 /* =========================================================
    Blog post — a single centred reading column
 
-   The width is the main decision here: measured in ch (the width of
-   a "0" in the current font) rather than pixels, because what makes
-   long text comfortable is how many characters land on a line, not
-   how many pixels. Somewhere around 65-75 is the usual target; much
-   wider and the eye loses its place coming back to the next line.
-   The figures and cover image span the full column, so the pictures
+   Measured in ch (the width of a "0") rather than pixels, because what makes
+   long text comfortable is how many characters land on a line — 65-75 is the
+   usual target. Figures and the cover span the full column, so the pictures
    stay generous while the text stays narrow.
    ========================================================= */
 .post-layout {
@@ -1047,10 +879,7 @@ img {
   margin: 0 0 var(--space-6);
   text-align: center;
   font-size: 14px;
-  opacity: 0.65; /* no muted text color exists in the tokens yet —
-                     DESIGN.md §2 still has --color-text-muted as
-                     [FILL IN] — so this dims the one text tier that
-                     needs it without inventing a second color */
+  opacity: 0.65; /* there's no muted-text token yet */
 }
 
 .post-cover {
@@ -1103,17 +932,14 @@ img {
   text-underline-offset: 3px;
 }
 
-/* Figures break out of the text rhythm deliberately — more air above
-   and below than a paragraph gets, so a screenshot reads as its own
-   beat in the post rather than crowding the sentence before it. */
+/* More air above and below than a paragraph gets, so a screenshot reads as
+   its own beat rather than crowding the sentence before it. */
 .post-figure {
   margin: var(--space-7) 0;
 }
 
-/* max-width rather than width, so a picture smaller than the column
-   (the team photo is only 262px wide) sits at its own size in the
-   middle instead of being blown up past its resolution and going
-   soft. Anything wider than the column still scales down to fit. */
+/* max-width rather than width, so a picture narrower than the column sits at
+   its own size instead of being blown up past its resolution. */
 .post-figure img {
   display: block;
   max-width: 100%;
@@ -1147,23 +973,14 @@ img {
    Page transitions — fade in on load, fade out just before
    following a link to another page on the site.
 
-   Scoped to .page-content (the <main> on every page — .games-layout
-   on index.html, .about-layout on about.html) rather than .page
-   itself, so the topbar (brand + nav) and the coffee-decor stay put
-   and only the part that actually changes between pages fades.
+   Scoped to .page-content (the <main> on every page) rather than .page, so
+   the topbar and the coffee cup stay put and only the part that actually
+   changes between pages fades.
 
-   The fade-in half is a plain CSS animation with no class gate, so
-   it just runs on its own the instant .page-content exists — it
-   still works correctly even if JS is off or hasn't finished
-   loading yet, unlike a class-toggle approach that would need JS to
-   ever reveal the content at all. The fade-out half can't be done
-   in CSS alone (nothing can delay a real navigation), so that part
-   is pagefade.js, loaded on every page — it adds .is-leaving and
-   waits out FADE_MS before actually navigating.
-
-   Same 250ms/ease timing as .games-stage's grid<->detail crossfade
-   (script.js) so the whole site reads as one consistent motion
-   language rather than two unrelated fades. */
+   The fade-in half is plain CSS with no class gate, so it runs even if JS
+   never loads. The fade-out half can't be — nothing in CSS can delay a real
+   navigation — so that half is pagefade.js. Same 250ms as the grid↔detail
+   crossfade in script.js, so the site reads as one motion language. */
 .page-content {
   opacity: 1;
   animation: page-fade-in 0.25s ease both;
