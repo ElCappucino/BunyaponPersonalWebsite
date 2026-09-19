@@ -13,7 +13,7 @@
   var bodyEl = document.getElementById("postBody");
   if (!titleEl || !bodyEl) return;
 
-  // An image on a line of its own: ![optional caption](file.png). Declared up
+  // An image on a line of its own: ![optional caption](file.webp). Declared up
   // here, not with the converter below, because the rendering runs first and
   // would otherwise reach for it while it's still empty.
   var IMAGE_LINE = /^!\[([^\]]*)\]\(([^)]+)\)$/;

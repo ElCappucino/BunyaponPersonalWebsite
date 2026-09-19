@@ -51,8 +51,8 @@
       itchUrl: "https://punpunxd.itch.io/yao-ying-yan",
       youtubeUrl: "https://www.youtube.com/watch?v=rUVgmxndLlk&t=74s",
       learnMoreUrl: "#",
-      cdImage: "../Assets/CD/CD_YaoYingYan.png",
-      screens: ["../Assets/Screens/YYY_Image1.png", "../Assets/Screens/YYY_Image2.png", "../Assets/Screens/YYY_Image3.png"]
+      cdImage: "Assets/CD/CD_YaoYingYan.webp",
+      screens: ["Assets/Screens/YYY_Image1.webp", "Assets/Screens/YYY_Image2.webp", "Assets/Screens/YYY_Image3.webp"]
     },
 
     "derrick": {
@@ -66,8 +66,8 @@
       itchUrl: "https://elcappu.itch.io/derrick",
       youtubeUrl: "https://www.youtube.com/watch?v=CUNxuDVp4Oc&t=1s",
       learnMoreUrl: "post.html?post=derrick",
-      cdImage: "../Assets/CD/CD_Derrick.png",
-      screens: ["../Assets/Screens/Derrick_Image1.png", "../Assets/Screens/Derrick_Image2.png", "../Assets/Screens/Derrick_Image3.png"]
+      cdImage: "Assets/CD/CD_Derrick.webp",
+      screens: ["Assets/Screens/Derrick_Image1.webp", "Assets/Screens/Derrick_Image2.webp", "Assets/Screens/Derrick_Image3.webp"]
     },
 
     "flappy": {
@@ -81,8 +81,8 @@
       itchUrl: "https://elcappu.itch.io/flappy-party",
       youtubeUrl: "https://www.youtube.com/watch?v=WEsmn-cPZVU&source_ve_path=MjM4NTE&embeds_referring_euri=https%3A%2F%2Felcappu.itch.io%2F",
       learnMoreUrl: "#",
-      cdImage: "../Assets/CD/CD_FlappyParty.png",
-      screens: ["../Assets/Screens/flappy_Image1.png", "../Assets/Screens/flappy_Image2.png", "../Assets/Screens/flappy_Image3.png"]
+      cdImage: "Assets/CD/CD_FlappyParty.webp",
+      screens: ["Assets/Screens/flappy_Image1.webp", "Assets/Screens/flappy_Image2.webp", "Assets/Screens/flappy_Image3.webp"]
     },
 
     "khlong-san": {
@@ -96,8 +96,8 @@
       itchUrl: "https://elcappu.itch.io/khlongsansamphob",
       youtubeUrl: "https://www.youtube.com/watch?v=0X1CXEE7mw8",
       learnMoreUrl: "#",
-      cdImage: "../Assets/CD/CD_KhlongSan.png",
-      screens: ["../Assets/Screens/KhlongSan_Image1.png", "../Assets/Screens/KhlongSan_Image2.png", "../Assets/Screens/KhlongSan_Image3.png"]
+      cdImage: "Assets/CD/CD_KhlongSan.webp",
+      screens: ["Assets/Screens/KhlongSan_Image1.webp", "Assets/Screens/KhlongSan_Image2.webp", "Assets/Screens/KhlongSan_Image3.webp"]
     },
 
     "seaside": {
@@ -111,8 +111,8 @@
       itchUrl: "https://elcappu.itch.io/seaside-showdown",
       youtubeUrl: "https://www.youtube.com/watch?v=bORGj4YTt6M&t=2s",
       learnMoreUrl: "#",
-      cdImage: "../Assets/CD/CD_Seaside.png",
-      screens: ["../Assets/Screens/Seaside_Image1.png", "../Assets/Screens/Seaside_Image2.png", "../Assets/Screens/Seaside_Image3.png"]
+      cdImage: "Assets/CD/CD_Seaside.webp",
+      screens: ["Assets/Screens/Seaside_Image1.webp", "Assets/Screens/Seaside_Image2.webp", "Assets/Screens/Seaside_Image3.webp"]
     },
 
     "sil-3": {
@@ -126,8 +126,8 @@
       itchUrl: "https://elcappu.itch.io/shameless-itim-lord-3",
       youtubeUrl: "https://www.youtube.com/watch?v=IhUYTDjYu3k&t=2s",
       learnMoreUrl: "#",
-      cdImage: "../Assets/CD/CD_SIL3.png",
-      screens: ["../Assets/Screens/SIL3_Image1.png", "../Assets/Screens/SIL3_Image2.png", "../Assets/Screens/SIL3_Image3.png"]
+      cdImage: "Assets/CD/CD_SIL3.webp",
+      screens: ["Assets/Screens/SIL3_Image1.webp", "Assets/Screens/SIL3_Image2.webp", "Assets/Screens/SIL3_Image3.webp"]
     },
 
     "summer-break": {
@@ -141,8 +141,8 @@
       itchUrl: "https://nmmn4947.itch.io/summer-festival",
       youtubeUrl: "https://www.youtube.com/watch?v=LgLR6r5RzNk",
       learnMoreUrl: "#",
-      cdImage: "../Assets/CD/CD_SummerBreak.png",
-      screens: ["../Assets/Screens/SummerBreak_Image1.png", "../Assets/Screens/SummerBreak_Image2.png", "../Assets/Screens/SummerBreak_Image3.png"]
+      cdImage: "Assets/CD/CD_SummerBreak.webp",
+      screens: ["Assets/Screens/SummerBreak_Image1.webp", "Assets/Screens/SummerBreak_Image2.webp", "Assets/Screens/SummerBreak_Image3.webp"]
     }
   };
 

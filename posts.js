@@ -56,20 +56,20 @@ var POSTS = [
     slug: "derrick",
     title: "Process of Making: Derrick",
     date: "August 2025",
-    cover: "../Assets/Screens/Derrick_Image1.png",
+    cover: "Assets/Screens/Derrick_Image1.webp",
     highlights: [
       "Process of implementing the aerial control of player and enemy entity.",
       "Problems that i approach about sound system."
     ],
-    imageBase: "../Assets/Blogs/Derrick/",
+    imageBase: "Assets/Blogs/Derrick/",
     body: `
 This project was developed during a university game jam. I teamed up with a group of friends I had never worked with before, so the experience felt fresh and exciting.
 
-![](team-derrick.png)
+![](team-derrick.webp)
 
 There was no specific theme. The only limitation was the one-month development period before the semester began. Since we didn't have a strong concept at the start, we decided to create a simple roguelike arcade-style aerial shooter. The player controls a plane, dodges bullets, and shoots enemies while managing aerial movement.
 
-![Huge inspiration from Wind Runners](derrick-inspiration.png)
+![Huge inspiration from Wind Runners](derrick-inspiration.webp)
 
 ## Movement
 
@@ -81,11 +81,11 @@ The movement process:
 2. Smoothly adjust the facing direction toward player input using SmoothDamp.
 3. Update the visual roll based on the current rotation.
 
-![](derrick_code1.png)
+![](derrick_code1.webp)
 
 The "update visual roll" step is important because it makes the plane movement feel smoother and more similar to modern aerial combat games.
 
-![](plane2_exampleClip.gif)
+![](plane2_exampleClip.webp)
 
 ## Enemy
 
@@ -93,15 +93,15 @@ To make enemy movement and chasing behavior feel smooth, I designed a state-base
 
 *This code was written before I learned about formal finite state machines, so the states were handled manually inside a straightforward update loop.*
 
-![](derrick-enemy.png)
+![](derrick-enemy.webp)
 
 - Chasing State: The enemy tracks the player's position, rotates toward them, and shoots with a cooldown.
 
-![](derrick-enemy-chase.png)
+![](derrick-enemy-chase.webp)
 
 - Fleeing State: The enemy moves away from the player and returns to the chasing state after a set duration.
 
-![](derrick-enemy-flee.png)
+![](derrick-enemy-flee.webp)
 
 Other enemy types, such as ground enemies and the boss, use similar behavior but without the fleeing state.
 
@@ -111,9 +111,9 @@ Enemy waves are structured in two layers: main waves and sub waves. Sub waves re
 
 I used Scriptable Objects to store wave data, making it easier for designers to configure and balance enemy patterns.
 
-![](derrick-enemy-wave.png)
+![](derrick-enemy-wave.webp)
 
-![](derrick-enemy-wave2.png)
+![](derrick-enemy-wave2.webp)
 
 ## Problems
 
@@ -123,7 +123,7 @@ However, it was more complex than expected and required a significant amount of 
 
 Later, I realized that Unity's built-in Audio Source with spatial blend settings could achieve a similar 2D surround effect much more simply. In hindsight, using FMOD for this case was somewhat over-engineered.
 
-![](derrick-sound.png)
+![](derrick-sound.webp)
 
 That said, if I need more advanced features such as sound mixing or detailed audio control in future projects, I would consider using FMOD again.
 
