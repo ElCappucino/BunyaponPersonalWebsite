@@ -194,3 +194,47 @@
     return match ? decodeURIComponent(match[1].replace(/\+/g, " ")) : "";
   }
 })();
+
+// Blog list page (blog.html) — one card per post, built straight from
+// POSTS in posts.js and in the order it lists them (newest first, per
+// that file's own convention), each one linking to its own post. A
+// separate function from the one above since the two run on different
+// pages — this one just does nothing on post.html, where #blogList
+// doesn't exist, same way the one above does nothing here.
+(function () {
+  var list = document.getElementById("blogList");
+  if (!list) return;
+
+  var posts = typeof POSTS === "undefined" ? [] : POSTS;
+
+  list.innerHTML = posts.length
+    ? posts.map(cardHtml).join("\n")
+    : "<p>No posts yet — check back soon.</p>";
+
+  function cardHtml(post) {
+    var highlights = (post.highlights || [])
+      .map(function (line) {
+        return "<li>" + escapeHtml(line) + "</li>";
+      })
+      .join("");
+
+    return (
+      '<a class="blog-card" href="post.html?post=' + encodeURIComponent(post.slug) + '">' +
+        (post.cover ? '<img class="blog-card-image" src="' + escapeHtml(post.cover) + '" alt="">' : "") +
+        '<div class="blog-card-text">' +
+          '<h2 class="blog-card-title">' + escapeHtml(post.title) + "</h2>" +
+          (highlights ? '<ul class="blog-card-highlights">' + highlights + "</ul>" : "") +
+          (post.date ? '<p class="blog-card-date">' + escapeHtml(post.date) + "</p>" : "") +
+        "</div>" +
+      "</a>"
+    );
+  }
+
+  function escapeHtml(text) {
+    return String(text == null ? "" : text)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;");
+  }
+})();

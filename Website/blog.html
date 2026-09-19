@@ -3,8 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- blog.js replaces this with the post's own title once it knows
-       which post is being shown -->
   <title>Blog – Bunyapon Chaiongkarn</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -13,11 +11,9 @@
 </head>
 <body>
 
-  <!-- One page serves every blog post. Which one it shows comes from
-       the address — post.html?post=derrick — and the content itself
-       lives in posts.js, so writing a new post never means touching
-       this file. page-scroll turns off the Games page's height cap
-       (see style.css) so a long post scrolls normally. -->
+  <!-- page-scroll turns off the Games page's height: 100vh cap (see
+       style.css) so this list can grow past one screen as posts pile
+       up — same reason post.html and about.html both use it. -->
   <div class="page page-scroll">
 
     <img class="coffee-decor" src="../Assets/Coffee.png" alt="" aria-hidden="true">
@@ -31,13 +27,11 @@
       </nav>
     </header>
 
-    <main class="post-layout page-content">
-      <article class="post">
-        <h1 class="post-title" id="postTitle"></h1>
-        <p class="post-date" id="postDate"></p>
-        <img class="post-cover" id="postCover" src="" alt="">
-        <div class="post-body" id="postBody"></div>
-      </article>
+    <main class="blog-layout page-content">
+      <!-- Filled in by blog.js from POSTS in posts.js — add a post
+           there and a card for it appears here on its own, no editing
+           needed in this file. -->
+      <div class="blog-list" id="blogList"></div>
     </main>
 
   </div>

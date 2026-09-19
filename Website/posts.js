@@ -16,8 +16,10 @@
 //              ("September 2026", "12 Sep 2026"). Leave it as ""
 //              to hide the line completely.
 //   cover      the big image under the title, or "" for none
-//   summary    one or two sentences, used later on the blog index
-//              page's card. Not shown on the post itself.
+//   highlights 1-3 short bullet points shown on this post's card on
+//              the blog list page — not shown on the post itself.
+//              Keep each one to a single line; that's the card, not
+//              the place to summarise the whole post.
 //   imageBase  the folder your post's images live in. Every image
 //              in the body below is looked for in here, so you
 //              write just the file name instead of the full path.
@@ -53,9 +55,12 @@ var POSTS = [
   {
     slug: "derrick",
     title: "Process of Making: Derrick",
-    date: "September 2026",
+    date: "August 2025",
     cover: "../Assets/Screens/Derrick_Image1.png",
-    summary: "This project was developed during a university game jam. I teamed up with a group of friends I had never worked with before, so the experience felt fresh and exciting.",
+    highlights: [
+      "Process of implementing the aerial control of player and enemy entity.",
+      "Problems that i approach about sound system."
+    ],
     imageBase: "../Assets/Blogs/Derrick/",
     body: `
 This project was developed during a university game jam. I teamed up with a group of friends I had never worked with before, so the experience felt fresh and exciting.
