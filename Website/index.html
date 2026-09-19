@@ -18,45 +18,127 @@
     <header class="topbar">
       <p class="brand">Bunyapon Chaiongkarn</p>
       <nav class="nav">
-        <a href="index.html">Games</a>
+        <a href="index.html" id="navGames" aria-current="page">Games</a>
         <a href="#">Blog</a>
-        <a href="#">About</a>
+        <a href="about.html">About</a>
       </nav>
     </header>
 
     <main class="games-layout">
 
-      <div class="case-stack" aria-hidden="true">
-        <img class="ps-bottom" src="../Assets/PS_Bottom.png" alt="">
-        <img class="ps-top" src="../Assets/PS_Top.png" alt="">
+      <!-- ps-cd sits between the bottom and top case layers, both in the
+           markup and in the z-index order (see style.css): ps-top is
+           always the front card, ps-cd always the middle layer, ps-bottom
+           always the back — that stacking never changes. Only ps-cd's
+           left/right position animates, sliding it from tucked-under to
+           peeking-out — see .case-stack.is-open .ps-cd in style.css. Its
+           `src` below is just the default/fallback shown before any card
+           is clicked — script.js's populateDetail() swaps it to the
+           clicked game's own disc art (GAMES[id].cdImage, from
+           Assets/CD/) at the same moment it fills in the rest of
+           #detailView, so the right disc is already showing before the
+           slide-out animation starts.
+
+           #navBack (below) is a real, functional control — not part of
+           the decorative case art — so it sits inside .case-stack only
+           for positioning (case-stack is already `position: relative`,
+           an easy anchor to sit right above the box), with the three
+           case images individually marked aria-hidden instead of the
+           whole container. It's only shown/focusable in detail view —
+           see .case-stack.is-open .case-back-link in style.css — and
+           wired up in script.js the same way #navGames is. -->
+      <div class="case-stack" id="caseStack">
+        <img class="ps-bottom" src="../Assets/PS_Bottom.png" alt="" aria-hidden="true">
+        <img class="ps-cd" src="../Assets/PS_CD.png" alt="" aria-hidden="true">
+        <img class="ps-top" src="../Assets/PS_Top.png" alt="" aria-hidden="true">
+        <a class="case-back-link" id="navBack" href="index.html">
+          <svg class="case-back-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M15 4l-8 8 8 8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Back to select page
+        </a>
       </div>
 
-      <div class="games-grid-wrap">
-        <div class="games-grid">
-          <a class="game-card" href="#">
-            <img src="../Assets/CD%20Case.png" alt="Yao Ying Yan">
-          </a>
-          <a class="game-card" href="#">
-            <img src="../Assets/CD%20Case.png" alt="Yao Ying Yan">
-          </a>
-          <a class="game-card" href="#">
-            <img src="../Assets/CD%20Case.png" alt="Yao Ying Yan">
-          </a>
-          <a class="game-card" href="#">
-            <img src="../Assets/CD%20Case.png" alt="Yao Ying Yan">
-          </a>
-          <a class="game-card" href="#">
-            <img src="../Assets/CD%20Case.png" alt="Yao Ying Yan">
-          </a>
-          <a class="game-card" href="#">
-            <img src="../Assets/CD%20Case.png" alt="Yao Ying Yan">
-          </a>
+      <!-- Only one of .games-grid-wrap / .game-detail is in the layout at
+           a time (the other carries `hidden`) — see script.js, which
+           fades .games-stage out, swaps `hidden`/`inert`, then fades it
+           back in. Keeping them as a real display swap (not just an
+           opacity crossfade) lets each view size and align itself
+           independently — the grid stays pinned under the navbar, the
+           detail panel centers on the remaining viewport height.
+
+           Each card's data-game key looks up its info in the GAMES object
+           in script.js (one editable block per game — date, description,
+           meta, links, CD art, screenshots), which fills in #detailView
+           (below) on click. Most games still hold the same placeholder
+           text for now, but each is its own block ready to edit — see
+           GAMES at the top of script.js. -->
+      <div class="games-stage" id="gamesStage">
+
+        <div class="games-grid-wrap" id="gridView">
+          <p class="games-prompt">Click to select your game!</p>
+          <div class="games-grid">
+            <a class="game-card" data-game="yao-ying-yan" href="#">
+              <img src="../Assets/CD_Case/CDCase_YaoYingYan.png" alt="Yao Ying Yan">
+            </a>
+            <a class="game-card" data-game="derrick" href="#">
+              <img src="../Assets/CD_Case/CDCase_Derrick.png" alt="Derrick">
+            </a>
+            <a class="game-card" data-game="flappy" href="#">
+              <img src="../Assets/CD_Case/CDCase_Flappy.png" alt="Flappy">
+            </a>
+            <a class="game-card" data-game="khlong-san" href="#">
+              <img src="../Assets/CD_Case/CDCase_KhlongSan.png" alt="Khlong San">
+            </a>
+            <a class="game-card" data-game="seaside" href="#">
+              <img src="../Assets/CD_Case/CDCase_Seaside.png" alt="Seaside">
+            </a>
+            <a class="game-card" data-game="sil-3" href="#">
+              <img src="../Assets/CD_Case/CDCase_SIL3.png" alt="SIL 3">
+            </a>
+            <a class="game-card" data-game="summer-break" href="#">
+              <img src="../Assets/CD_Case/CDCase_SummerBreak.png" alt="Summer Break">
+            </a>
+          </div>
         </div>
+
+        <div class="game-detail" id="detailView" hidden inert>
+          <div class="detail-info">
+            <h2 class="detail-title">Yao Ying Yan</h2>
+            <p class="detail-date">October 2025</p>
+            <p class="detail-desc">An arcade shooter game that player draw symbols on a Post-it and use it as a talisman to fight ghosts.</p>
+
+            <dl class="detail-meta">
+              <div class="meta-row"><dt>Main Role :</dt><dd data-field="mainRole">Programmer</dd></div>
+              <div class="meta-row"><dt>Team Size :</dt><dd data-field="teamSize">15 People</dd></div>
+              <div class="meta-row"><dt>Time Period :</dt><dd data-field="timePeriod">1 Week (Game Jam)</dd></div>
+              <div class="meta-row"><dt>Tools :</dt><dd data-field="tools">Unity Engine</dd></div>
+            </dl>
+
+            <div class="detail-actions">
+              <a class="icon-link" href="#" aria-label="itch.io" target="_blank" rel="noopener noreferrer">
+                <img src="../Assets/Icon/itch-io_iconl.svg" alt="">
+              </a>
+              <a class="icon-link" href="#" aria-label="YouTube" target="_blank" rel="noopener noreferrer">
+                <img src="../Assets/Icon/youtube_icon.svg" alt="">
+              </a>
+              <a class="btn-learn-more" href="#">Learn More</a>
+            </div>
+          </div>
+
+          <div class="detail-screens">
+            <img src="../Assets/YYY_Image1.png" alt="Yao Ying Yan gameplay screenshot 1">
+            <img src="../Assets/YYY_Image2.png" alt="Yao Ying Yan gameplay screenshot 2">
+            <img src="../Assets/YYY_Image3.png" alt="Yao Ying Yan gameplay screenshot 3">
+          </div>
+        </div>
+
       </div>
 
     </main>
 
   </div>
 
+  <script src="script.js" defer></script>
 </body>
 </html>
