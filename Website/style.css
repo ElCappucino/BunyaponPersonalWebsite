@@ -886,3 +886,52 @@ img {
     gap: var(--space-6);
   }
 }
+
+/* =========================================================
+   Page transitions — fade in on load, fade out just before
+   following a link to another page on the site.
+
+   Scoped to .page-content (the <main> on every page — .games-layout
+   on index.html, .about-layout on about.html) rather than .page
+   itself, so the topbar (brand + nav) and the coffee-decor stay put
+   and only the part that actually changes between pages fades.
+
+   The fade-in half is a plain CSS animation with no class gate, so
+   it just runs on its own the instant .page-content exists — it
+   still works correctly even if JS is off or hasn't finished
+   loading yet, unlike a class-toggle approach that would need JS to
+   ever reveal the content at all. The fade-out half can't be done
+   in CSS alone (nothing can delay a real navigation), so that part
+   is pagefade.js, loaded on every page — it adds .is-leaving and
+   waits out FADE_MS before actually navigating.
+
+   Same 250ms/ease timing as .games-stage's grid<->detail crossfade
+   (script.js) so the whole site reads as one consistent motion
+   language rather than two unrelated fades. */
+.page-content {
+  opacity: 1;
+  animation: page-fade-in 0.25s ease both;
+}
+
+@keyframes page-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+.page-content.is-leaving {
+  animation: page-fade-out 0.25s ease both;
+}
+
+@keyframes page-fade-out {
+  to {
+    opacity: 0;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-content,
+  .page-content.is-leaving {
+    animation: none;
+  }
+}
