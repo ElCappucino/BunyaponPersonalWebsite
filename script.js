@@ -202,15 +202,22 @@
     el.style.animation = "";
   }
 
-  // Kicks off the network requests for a game's detail images as soon as its
-  // card is clicked, instead of waiting for populateDetail() to set them on
-  // the real <img> elements after the fade-out finishes. These Image()
-  // objects are never attached to the page — they exist only to warm the
-  // browser's cache, so that by the time populateDetail() points the visible
-  // <img>s at the same URLs (FADE_MS later), the bytes are already there and
-  // the swap paints on the next frame instead of showing a half-loaded image.
+  // Kicks off the network requests for a game's detail images as early as
+  // possible — on hover (below) and, as a fallback for whichever comes
+  // first, at click time (in crossFadeTo()) — instead of waiting for
+  // populateDetail() to set them on the real <img> elements after the
+  // fade-out finishes. These Image() objects are never attached to the page
+  // — they exist only to warm the browser's cache, so that by the time
+  // populateDetail() points the visible <img>s at the same URLs, the bytes
+  // are already there and the swap paints on the next frame instead of
+  // showing a half-loaded image.
+  //
+  // preloadedGames dedupes so hovering a card twice, or hovering then
+  // clicking, only fires the requests once per game.
+  var preloadedGames = new Set();
   function preloadGameImages(game) {
-    if (!game) return;
+    if (!game || preloadedGames.has(game)) return;
+    preloadedGames.add(game);
     game.screens.forEach(function (src) {
       new Image().src = src;
     });
@@ -257,9 +264,21 @@
 
   // Each card's data-game (set in index.html) looks up its info in GAMES.
   document.querySelectorAll(".game-card").forEach(function (card) {
+    var game = GAMES[card.dataset.game];
+
     card.addEventListener("click", function (e) {
       e.preventDefault();
-      crossFadeTo(true, GAMES[card.dataset.game]);
+      crossFadeTo(true, game);
+    });
+
+    // Warms this game's images the moment the pointer enters its card, so a
+    // deliberate hover-then-click has a real head start beyond the click-time
+    // preload in crossFadeTo() — by the time the click lands, a hover of even
+    // a few hundred ms may already have the images most or all of the way
+    // downloaded. Mouse/trackpad only (there's no hover on touch), but touch
+    // still gets the click-time preload as a fallback, same as before.
+    card.addEventListener("mouseenter", function () {
+      preloadGameImages(game);
     });
   });
 
