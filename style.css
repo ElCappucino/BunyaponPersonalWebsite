@@ -460,6 +460,15 @@ img {
 .detail-screens img {
   display: block;
   width: 100%;
+  /* Reserves the slot's height from the box itself rather than the image's
+     own intrinsic size (all 21 screenshots are close to 16:9, so the crop
+     from object-fit is only ever a sliver). Without this, the instant
+     script.js clears or repoints an <img> mid-swap the column would collapse
+     and reflow the whole detail panel around it. */
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  background: var(--color-surface); /* shows through while a screenshot is
+    loading or between swaps, instead of a hole in the layout */
   border-radius: var(--radius-card);
 }
 

@@ -202,11 +202,33 @@
     el.style.animation = "";
   }
 
+  // Kicks off the network requests for a game's detail images as soon as its
+  // card is clicked, instead of waiting for populateDetail() to set them on
+  // the real <img> elements after the fade-out finishes. These Image()
+  // objects are never attached to the page — they exist only to warm the
+  // browser's cache, so that by the time populateDetail() points the visible
+  // <img>s at the same URLs (FADE_MS later), the bytes are already there and
+  // the swap paints on the next frame instead of showing a half-loaded image.
+  function preloadGameImages(game) {
+    if (!game) return;
+    game.screens.forEach(function (src) {
+      new Image().src = src;
+    });
+    if (game.cdImage) {
+      new Image().src = game.cdImage;
+    }
+  }
+
   var FADE_MS = 250; // keep in sync with .games-stage's transition-duration in style.css
 
   function crossFadeTo(showDetail, game) {
     if (stage.classList.contains("is-fading")) return; // already mid-transition
     stage.classList.add("is-fading");
+
+    if (showDetail) {
+      preloadGameImages(game); // start now, in parallel with the fade-out
+        // below, rather than only after FADE_MS — see preloadGameImages().
+    }
 
     window.setTimeout(function () {
       if (showDetail) {
