@@ -18,6 +18,15 @@
   // would otherwise reach for it while it's still empty.
   var IMAGE_LINE = /^!\[([^\]]*)\]\(([^)]+)\)$/;
 
+  // A video on a line of its own. Two ways to write it, both handled by
+  // videoParts() below: the address on its own, or a [caption](address)
+  // link pointing at it. Only YouTube is recognised — anything else stays
+  // an ordinary link, which is the safe outcome rather than a broken frame.
+  var LINK_LINE = /^\[([^\]]*)\]\(([^)\s]+)\)$/;
+  var BARE_URL_LINE = /^https?:\/\/\S+$/i;
+  var YOUTUBE_ID =
+    /(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|embed\/|shorts\/))([\w-]{6,})/i;
+
   var posts = typeof POSTS === "undefined" ? [] : POSTS;
   var slug = getParam("post");
   var post = null;
@@ -94,6 +103,16 @@
       return "<h" + level + ">" + inline(heading[2]) + "</h" + level + ">";
     }
 
+    // One or more videos, each on its own line. Checked before the image
+    // and paragraph branches because a bare address would otherwise just
+    // become a paragraph, and a [caption](address) link an inline link.
+    if (videoParts(first)) {
+      return lines.map(function (line) {
+        var v = videoParts(line);
+        return v ? videoEmbed(v) : paragraph(line);
+      }).join("\n");
+    }
+
     // One or more images, each on its own line
     if (IMAGE_LINE.test(first)) {
       return lines.map(function (line) {
@@ -129,6 +148,46 @@
       escapeHtml(resolveImage(src, imageBase)) + '" alt="' +
       escapeHtml(caption) + '" loading="lazy">';
     if (caption) html += "<figcaption>" + inline(caption) + "</figcaption>";
+    return html + "</figure>";
+  }
+
+  // Works out whether a line is a video on its own, and if so which video.
+  // Returns null for anything else, which is what lets blockToHtml fall
+  // through to its normal handling.
+  function videoParts(line) {
+    var caption = "";
+    var url = "";
+    var link = line.match(LINK_LINE);
+
+    if (link) {
+      caption = link[1];
+      url = link[2];
+    } else if (BARE_URL_LINE.test(line)) {
+      url = line;
+    } else {
+      return null;
+    }
+
+    var id = url.match(YOUTUBE_ID);
+    if (!id) return null;
+    // "[address](address)" — the visible half repeats the link and would
+    // make a caption that just reads as a URL, so drop it.
+    if (caption === url) caption = "";
+    return { id: id[1], caption: caption };
+  }
+
+  // youtube-nocookie rather than youtube.com: same player, but it doesn't
+  // set tracking cookies until the visitor actually presses play.
+  // loading="lazy" matches the images — a reader who never scrolls this far
+  // never pays for the player.
+  function videoEmbed(v) {
+    var html =
+      '<figure class="post-video"><iframe src="https://www.youtube-nocookie.com/embed/' +
+      encodeURIComponent(v.id) +
+      '" title="YouTube video player" loading="lazy" referrerpolicy="strict-origin-when-cross-origin"' +
+      ' allow="accelerometer; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"' +
+      " allowfullscreen></iframe>";
+    if (v.caption) html += "<figcaption>" + inline(v.caption) + "</figcaption>";
     return html + "</figure>";
   }
 

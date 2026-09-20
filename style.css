@@ -956,12 +956,33 @@ img {
   border-radius: var(--radius-card);
 }
 
-.post-figure figcaption {
+.post-figure figcaption,
+.post-video figcaption {
   margin-top: var(--space-2);
   text-align: center;
   font-size: 14px;
   font-style: italic;
   opacity: 0.65;
+}
+
+/* Embedded video — same vertical rhythm as a screenshot, so a clip reads as
+   the same kind of beat in the post. */
+.post-video {
+  margin: var(--space-7) 0;
+}
+
+/* The 16/9 box is reserved before the player loads, so the text below it
+   doesn't jump once the iframe paints — same reasoning as the reserved box
+   on the game-detail screenshots. The surface fill is what's visible in that
+   gap, and while a slow connection is still fetching the player. */
+.post-video iframe {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16 / 9;
+  border: 0;
+  border-radius: var(--radius-card);
+  background: var(--color-surface);
 }
 
 @media (max-width: 768px) {

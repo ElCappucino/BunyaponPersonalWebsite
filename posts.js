@@ -38,6 +38,10 @@
 //   1. item                 a numbered list (one per line)
 //   ![](picture.png)        an image, on its own line
 //   ![A caption](pic.png)   an image with a caption under it
+//   https://youtu.be/xxxx   a YouTube address on its own line turns
+//                           into an embedded player
+//   [A caption](https://youtu.be/xxxx)
+//                           the same, with a caption under it
 //   *slanted*               italic text
 //   **heavy**               bold text
 //   [link text](https://…)  a link
