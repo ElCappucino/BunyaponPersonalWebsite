@@ -53,6 +53,126 @@
 // ============================================================
 var POSTS = [
   {
+    slug: "procedural-terrarium",
+    title: "Procedural Generation for Terrarium Environment In Unreal Engine 5",
+    date: "July 2026",
+    cover: "Assets/Blogs/ProceduralTerrarium/ProTer_BlogCard.webp",
+    highlights: [
+      "Study the procedural generation pipeline in Unreal Engine 5.",
+      "Learn how to make a tool for artists to improve scene composite and props arrangement speed in editor."
+    ],
+    imageBase: "Assets/Blogs/ProceduralTerrarium/",
+    body: `
+## Introduction
+
+This is the project that I am working on during my internship program at Tokyo University of Technology. The purpose of the study is to learn about the procedural generation pipeline in Unreal Engine 5 and improve artist scene composite and props arrangement time in editor.
+
+In this article, I will explain how I created this tool and what I learn from this project.
+
+## Technical Details
+
+**Unreal Engine 5.6.1 (Blueprint & C++)**
+
+- **Editor Utility Widget** (for creating tools interface)
+- **Generated Dynamic Mesh Component** (for procedural mesh generation in editor)
+- **Unreal Engine PCG Pipeline** (for procedural placement)
+
+**Blender 5.0**
+
+- For modeling some parts of the environment (Ex. Leaves, Pebbles, Moss’s leaf)
+
+## Procedural Mesh Generation VS Procedural Terrain
+
+In Unreal Engine, the procedural mesh and procedural terrain use different tools to create.
+
+- For procedural mesh, It should use Unreal Engine’s Dynamic Mesh Component.
+- For procedural terrain, It should use Unreal Engine’s PCG Pipeline.
+
+Because of that, I need to distinguish the components in the terrarium to suit each tool.
+
+For containers, rocks and foliages, I use procedural mesh because the part that needs to procedurally create is the shape.
+
+For mosses and pebbles, I use procedural terrain because it needs the procedural placement.
+
+## Editor Utility Widget (EUW) : Key to create a modifying tool and utility button.
+
+Before going into the procedural generation detail, I want to introduce the feature that I use to create a tool with a better user interface and create more features other than modify parameters. It is called “Editor Utility Widget”.
+
+Editor Utility Widget is a tool based on Unreal Engine’s UMG (Unreal Motion Graphics). It is a tool that can be used to create a custom user interface in Unreal Engine’s editor. You can set up a button with a function that works like a shortcut Ex. a button to create a preset object in the scene.
+
+![](ProTer_EUW_1.webp)
+
+It helps me a lot in this project because my tool is meant to be helpful to artists that want to compose the scene but don't want to get involved with unrelated parameters inside the Unreal Engine.
+
+## Addition Custom C++ Tools For EUW : On Selection Editor Changed
+
+Editor Utility Widget has some limitations. One of them is that the user interface doesn’t update when the user selects an object in the editor scene. This can be a nuisance because the user needs to click an update button every time they want to update the data.
+
+Luckily, there is a tutorial on how to make a custom node using c++.
+
+[https://qiita.com/Rinderon/items/4eb84cd88f8e4bc019bc](https://qiita.com/Rinderon/items/4eb84cd88f8e4bc019bc)
+
+There is some adjustment because the tutorial article is for UE4. But after all the debugging, it works fine now and it is a huge upgrade to my tools.
+
+## Components : Rocks
+
+I use box as a primitive shape, add a loop cut using subdivision, and create rough texture using perlin noise.
+
+![](ProTer_rock_1.webp)
+![](ProTer_rock_2.webp)
+
+The surface doesn’t look natural enough, so I added a plane cut to create a natural cut surface.
+
+![](ProTer_rock_3.webp)
+![](ProTer_rock_gif1.webp)
+
+The result
+
+![](ProTer_rock_4.webp)
+![](ProTer_rock_gif2.webp)
+
+## Components : Foliage (Fern)
+
+I create a stem along the spline and use the position along the spline for mesh placement.
+
+![](ProTer_fern_gif1.webp)
+
+I also optimize the leaf placement by using Unreal Engine’s Hierarchical Instanced Static Mesh (HISM). It is a way to copy instances of a single mesh on GPU and create multiple objects from a transform data.
+
+![](ProTer_fern_1.webp)
+
+I also make a shortcut to create a new fern object in the same clump.
+
+![](ProTer_fern_2.webp)
+![](ProTer_fern_gif2.webp)
+
+## Components : Mosses and Pebbles
+
+For the components that need to create multiple objects in the specific area like mosses and pebbles, I use Unreal Engine’s PCG Pipeline. The object that I use doesn’t need procedural mesh generation, so I model it in Blender separately and use PCG to randomly generate inside the area.
+
+![](ProTer_preset_3.webp)
+![](ProTer_area_gif1.webp)
+![](ProTer_area_gif2.webp)
+
+## Components : Container
+
+For the container, I originally wanted to make it procedural too but it causes a problem when I want to place a PCG volume that needs raycast on the static mesh surface but the procedural mesh is a dynamic mesh. In the end, I model it in blender and just make the shortcut button in EUW to create it as a preset.
+
+![](ProTer_preset_4.webp)
+
+## Results and Timelapse
+
+- Most of the features are working properly. It took around 30-60 minutes to create a simple terrarium.
+- Some of the components still have a performance issue (Ex. Frame lag when moving objects which rebuild itself during adjustments).
+- Tools still have some user experience issues (Ex. Some of the features should have a one-click solution).
+- Overall, I achieved all the objectives and made me understand a lot more about Unreal Engine 5 and the procedural generation pipeline.
+
+![](ProTer_preset_2.webp)
+
+[https://youtu.be/_eXzn-kUcYo](https://youtu.be/_eXzn-kUcYo)
+`
+  },
+  {
     slug: "derrick",
     title: "Process of Making: Derrick",
     date: "August 2025",

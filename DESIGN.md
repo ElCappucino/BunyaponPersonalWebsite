@@ -1,9 +1,14 @@
 # DESIGN.md
 
-Single source of truth for turning the Figma design into the website.
-Any new Claude session should read this file first.
+Single source of truth for this site's design and build state. Any new
+Claude session (or human collaborator, on any device) should read this file
+first before touching the code.
 
-Sections marked **[FILL IN]** need your real values — everything else is already decided.
+The site is **built and deployed** — this file used to be a pre-build
+intake form; it's now a living reference for what actually exists. Treat
+**§10 Known gaps** as the live to-do list and **§11 Decisions log** as
+project history. A few **[FILL IN]** markers remain in place for things
+that are still genuinely undecided.
 
 ---
 
@@ -11,227 +16,263 @@ Sections marked **[FILL IN]** need your real values — everything else is alrea
 
 | | |
 |---|---|
-| Design file | Read screenshots from folder |
-| Stack | default: plain HTML + CSS. |
-| OS / dev machine | Linux Mint |
-| Browser | Zen (Firefox-based) |
-| Target | Desktop 1440px + mobile 375px |
-| Status | Not started |
+| Design file | `DraftScreenshot/` folder — used for the initial build (see §6/§7). Not needed for ongoing edits; game content is data-driven (see §3). |
+| Stack | Plain HTML + CSS + vanilla JS. No build step, no framework, no dependencies. |
+| Dev machine | Windows (moved off Linux Mint after the initial build — §9 below is current; ignore any old Linux-specific notes you find elsewhere). |
+| Browser (dev testing) | Whatever's on hand on Windows (Edge/Chrome) + a phone for the mobile breakpoint. *(Update this row if that's no longer accurate.)* |
+| Target | Desktop ~1440px + mobile ~375px, with real breakpoints at 1150/1024/768/480px (see §8) |
+| Hosting | GitHub Pages, repo root (see §9) |
+| Live URL | `https://elcappucino.github.io/` — this assumes the repo-rename step from the 2026-09-19 deploy (§11) was completed. **Confirm and correct this if the actual URL differs.** |
+| Status | Core build complete (Games / About / Blog / Post), deployed, now in an iterative polish pass — currently image-loading UX (see §10, §11). |
 
 ---
 
-## 2. Design tokens **[DRAFT — pixel-sampled from screenshots, not Figma Dev Mode]**
+## 2. Design tokens — confirmed (no longer draft)
 
-Values below were sampled from `DraftScreenshot/Home_SelectGame.png` and
-`Home_ShowGame.png` (a 960px-wide browser capture, not a 2x Figma export), so treat
-this as a working starting point. **[ESTIMATED]** = measured but not Figma-confirmed.
-**[FILL IN]** = not evidenced in either screenshot at all. Re-confirm everything here
-against Figma Dev Mode per §7 once you have access, then drop the tags.
+These are the real values shipped in `style.css`, not estimates. The
+original screenshot-sampled draft turned out accurate enough that nothing
+here changed except filling two open slots (below).
 
-### Colors — [ESTIMATED] (sampled directly, identical across both screenshots)
+### Colors
 
 ```css
 :root {
-  --color-bg:        #EEE4DD; /* page background — matches on both screens */
-  --color-surface:   #D9D9D9; /* card header / tag bar */
-  --color-text:      #000000; /* every text sample came back pure black:
-                                   name, nav, title, body, labels */
-  --color-text-muted:#______;  /* [FILL IN] — no muted tone found; everything
-                                   sampled as pure black. Add one, or confirm the
-                                   design has no muted tier. */
-  --color-primary:   #583600; /* the one brand color present — identical fill on
-                                   the "Learn More" button and the coffee-cup icon */
-  --color-accent:    #583600; /* same value as primary; only one accent color shows
-                                   up anywhere in the draft — split these once a second
-                                   tone (hover state, etc.) exists */
-  --color-border:    #______;  /* [FILL IN] — no visible stroke anywhere; cards read
-                                   via surface contrast + shadow, not a border color */
+  --color-bg:        #EEE4DD; /* page background */
+  --color-surface:   #D9D9D9; /* card header / tag bar / neutral fill —
+                                  also now the placeholder background for
+                                  detail-view screenshots while they load,
+                                  see §11 2026-09-20 */
+  --color-text:      #000000; /* the only text color used anywhere */
+  --color-primary:   #583600; /* Learn More button, coffee-cup icon */
+  --color-accent:    #583600; /* same value as primary — still only one
+                                  accent color anywhere on the site */
 }
 ```
 
-### Typography — [ESTIMATED] (visual match, not a confirmed font file)
+`--color-text-muted` and `--color-border` from the original draft were
+never added. In the finished build every text sample is pure black and
+every surface reads through background contrast + shadow rather than a
+stroke — so treat these as resolved-as-"not needed," not as still-missing,
+unless a real muted-text or bordered-card need comes up later.
 
-- One family covers both heading and body — weight is what differentiates
-  (bold: site name, nav links, game-detail title, field labels — regular: body copy,
-  field values). Site name, nav links, and the detail-view title all measured the same
-  relative size, so they're one type step, not three.
-- Style: bold geometric sans — double-story "a", single-story "g", even stroke weight,
-  rounded terminals. Closest Google Font candidates: **Poppins**, Manrope, Plus Jakarta
-  Sans, Nunito Sans.
-- Heading font: *Poppins* (tentative — swap if a real font file turns up)
-- Body font: *Poppins* (tentative — same family, lighter weight)
-- Scale (relative sizing, not pixel-exact): heading / nav / section-title ≈ 18–20px,
-  body copy ≈ 14–16px, small caption text (e.g. the "CAPPU" tag) ≈ 10–11px.
-  Full scale still *[FILL IN]* — these two screens don't show a large hero size.
-- Body line-height: ≈ 1.4–1.5 (visual estimate)
-- Heading line-height: ≈ 1.2 (visual estimate)
+### Typography
 
-### Spacing — [ESTIMATED] (measured pixel gaps, 960px-wide screenshot)
+- Single family: **Poppins**, loaded from Google Fonts, weights 400/500/600/700.
+- Confirmed sizes actually in use (desktop; several use `clamp()` so they
+  scale down a bit on narrower viewports — see the CSS for exact ranges):
 
-Spacing scale: 4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 96 — the doc's suggested scale;
-the measurements below land on it without forcing:
+  | Element | Size |
+  |---|---|
+  | Brand name (topbar) | 22px / 700 |
+  | Nav links | 18px / 600 |
+  | Games grid prompt | 18px / 700 |
+  | Game detail title | clamp(20–30px) / 700 |
+  | Game detail date / desc / meta | clamp(14–19px) |
+  | About section titles | 20px / 700 |
+  | About name | 18px |
+  | About body / tags | 14px / 13px |
+  | Blog card title | 19px / 700 |
+  | Blog card highlights / date | 14px / 13px |
+  | Post title | clamp(24–34px) / 700 |
+  | Post body | 17px (16px ≤768px) |
+  | Post body h2/h3/h4 | 22/18/17px |
 
-- Game-grid gutter (row + column gap): measured ≈ 44px → **--space-7 (48)**
-- Gap between stacked content blocks on the detail panel (title → date → body →
-  details → CTA): measured ≈ 16–18px → **--space-4 (16)**
-- Tight/inline gaps (label-to-value, line leading): measured ≈ 4–6px → **--space-1/2 (4–8)**
+- Body line-height ≈ 1.5–1.7 depending on context, heading line-height ≈ 1.2–1.3.
 
-Exposed as `--space-1` … `--space-9`.
+### Spacing
+
+Confirmed scale, exposed as `--space-1` … `--space-9` and used consistently
+throughout: **4 / 8 / 12 / 16 / 24 / 32 / 48 / 64 / 96px**.
 
 ### Other
 
-- Border radius: buttons are a full pill — measured radius ≈ half the button height
-  (~19px on a ~38px-tall "Learn More" button), so treat button radius as `9999px`/full.
-  [ESTIMATED] Cards look softly rounded but the corner wasn't cleanly measurable from
-  the screenshot — estimate 8–12px and confirm.
-- Shadows: *[FILL IN]* — the card stack and placeholder box clearly cast a drop shadow
-  in the mockup, but color/blur weren't sampled.
-- Max content width: *[FILL IN — e.g. 1200px]*
-- Breakpoints: mobile `< 768px`, tablet `768–1024px`, desktop `> 1024px` *(adjust if the design says otherwise)*
+- Border radius: `--radius-card: 10px`, `--radius-full: 9999px` (buttons, pills).
+- Max content widths are set per content type rather than from one shared
+  token — a game-detail row, the about-page bio grid, and a blog reading
+  column all want very different maximums:
+  - `--max-content-width: 1600px` — topbar only
+  - About layout: `max-width: 1140px`
+  - Blog list: `max-width: 720px`
+  - Post body: `max-width: 68ch`
+- Breakpoints: see §8 for the real ones (they ended up more granular than
+  the original three-tier estimate).
 
 ---
 
-## 3. Page sections
+## 3. Site map (replaces the old Figma-frame table — there's no per-frame
+mapping anymore, the site is built)
 
-One horizontal band of the page = one Figma frame = one PNG export = one `<section>`.
-
-| Band | Frame name | Export file | Element | Status |
-|---|---|---|---|---|
-| Top bar | `nav` | `nav.png` | `<nav>` | ☐ |
-| Headline area | `hero` | `hero.png` | `<section class="hero">` | ☐ |
-| *[FILL IN]* | | | | ☐ |
-| Bottom bar | `footer` | `footer.png` | `<footer>` | ☐ |
-
-**Note:** Figma's own "Section" object (`Shift+S`) is only for organizing the canvas.
-It is unrelated to the page sections above and is never exported.
-
----
-
-## 4. Components **[FILL IN]**
-
-Anything that is a Figma *component* becomes one reusable CSS class.
-CSS class names match the Figma component names so the design file and the
-code share vocabulary.
-
-| Figma component | CSS class | Instances | Variants exported |
+| Page | Purpose | Scripts loaded | Content source |
 |---|---|---|---|
-| *e.g.* `CardFeature` | `.card-feature` | 3 | — |
-| *e.g.* `Button` | `.btn` | 5 | default / hover / disabled |
+| `index.html` | Games — grid of case art that opens into a per-game detail view (case-stack slides open, CD spins out, screenshots shown) | `pagefade.js`, `script.js` | `GAMES` object at the top of `script.js` — add/edit a game there, nothing else needs touching |
+| `about.html` | About — photo, socials, tools/dev tag lists, bio sections | `pagefade.js` | Hand-written in the HTML directly |
+| `blog.html` | Blog — list of post cards | `pagefade.js`, `posts.js`, `blog.js` | `POSTS` array in `posts.js` |
+| `post.html` | Single post template, routed by `?post=<slug>` | `pagefade.js`, `posts.js`, `blog.js` | Same `POSTS` array — one template renders every post |
 
-Export every variant separately — variants are the only reliable source for
-hover, active and disabled styling.
-
----
-
-## 5. Build order
-
-Never out of order. Each step depends on the one before it.
-
-1. **Tokens / global CSS** — §2 values become CSS custom properties
-2. **Layout shell + nav** — page container, max-width, grid
-3. **Sections, one at a time** — in the order of §3
-4. **Responsive pass** — mobile layout for every section
-5. **Motion** — hover transitions, scroll reveals, last
+`pagefade.js` runs on every page (it's the cross-page fade-out on
+navigation); `script.js` only runs on `index.html`.
 
 ---
 
-## 6. Working agreement
+## 4. Components (real inventory, replaces the old placeholder table)
 
-**One section per message.** Attach that section's PNG, say which section it is,
-let it finish before moving on. Sending all sections at once produces uniformly
-mediocre output.
+| Component | CSS class(es) | Notes |
+|---|---|---|
+| Case-stack (closed book / open CD) | `.case-stack`, `.ps-bottom`, `.ps-cd`, `.ps-top`, `.case-back-link` | Always mounted; `.is-open` (toggled by `script.js`) slides the CD out and reveals the back link. Continuous spin via `@keyframes cd-spin`, off under `prefers-reduced-motion`. |
+| Game card (grid) | `.game-card`, `.games-grid` | Spring-bounce hover (`cubic-bezier(0.34, 1.56, 0.64, 1)`). |
+| Game detail | `.game-detail`, `.detail-info`, `.detail-title/-date/-desc/-meta`, `.detail-screens`, `.detail-actions` | Populated by `populateDetail()` in `script.js`. `.detail-screens img` reserves a `16/9` box — see §11 2026-09-20. |
+| View cross-fade | `.games-stage`, `.is-fading`, `.is-detail` | 250ms opacity fade, timed with `FADE_MS` in `script.js`. |
+| Icon link | `.icon-link` | Shared between game-detail socials and the About page's social row. |
+| Pill button | `.btn-learn-more` | Full-radius CTA. |
+| About boxes | `.about-box`, `.tag-list` | Tools / Development tag lists. |
+| About bio sections | `.about-section`, `.about-list`, `.about-sublist` | Repeated per bio block. |
+| Blog card | `.blog-card`, `.blog-card-image/-text/-title/-highlights/-date` | Row layout ≥620px, stacks below. |
+| Post body | `.post`, `.post-title/-date/-cover`, `.post-body`, `.post-figure` | `.post-body` is filled from parsed Markdown-ish text — see the writing guide at the top of `posts.js`. |
+| Page transition | `.page-content`, `.is-leaving` | CSS-only fade-in on load; fade-out half needs `pagefade.js` since CSS can't delay a navigation. |
+
+---
+
+## 5. Build order — completed
+
+This was followed in order for the initial build and held up fine:
+
+1. Tokens / global CSS
+2. Layout shell + nav
+3. Sections, one at a time
+4. Responsive pass
+5. Motion (hover transitions, cross-fades, CD spin)
+
+If a genuinely new page/section gets added later, follow the same order.
+
+---
+
+## 6. Working agreement (still applies to any *new* Figma-based section)
+
+**One section per message.** Attach that section's PNG, say which section it
+is, let it finish before moving on.
 
 **Review loop, after every section:**
 
-1. Open the page in Zen → right-click → *Take Screenshot* → **Save full page**
-2. Paste that screenshot back **next to the Figma export**
+1. Open the page → screenshot → save full page
+2. Paste that screenshot back next to the Figma export
 3. Name what's wrong in plain words — "cards too tight", "heading too light"
 
-A visual diff gets fixed. A verbal description alone gets guessed at.
-Two rounds per section is normal.
-
 **Never redraw exported assets in CSS.** Icons and logos come in as SVG files.
-A hand-coded approximation will be close but wrong, and costs turns to fix.
 
 ---
 
-## 7. Figma export rules
+## 7. Figma export rules (still valid reference for future additions)
 
-- Export **2x PNG**, one file per section. Never one tall full-page image —
-  it gets downscaled and text sizes and spacing become unreadable.
+- Export **2x PNG**, one file per section — never one tall full-page image.
 - Export a **mobile frame** too, or write the collapse behavior into §8.
-  Figma frames are fixed-width and say nothing about responsive behavior.
-- Icons and logos → **SVG**. Photos → **PNG or WebP**.
-- Screenshot the Dev Mode inspect panel for one text element and one button —
-  that hands over exact sizes, weights, line-heights and padding for free.
-- **Rename every frame before exporting.** The frame name becomes the filename.
-  `hero.png` carries meaning; `Frame 247.png` does not.
-- If the design is one big frame with loose layers, select a band's layers and
-  press `Ctrl+Alt+G` (*Frame selection*) to wrap and name it.
-- **Fonts must be Google Fonts.** Figma's local-font helper does not exist on
-  Linux, so the browser version of Figma cannot see locally installed fonts.
-
-### Filename cleanup (required)
-
-Component names with slashes (`Button/Primary/Large`) export as nested folders,
-and the filesystem here is case-sensitive — `Hero.png` and `hero.png` are
-different files, and a mismatch breaks the site locally *and* on any Linux host.
-
-Flatten and normalize after every export:
-
-```bash
-find . -name '*.png' | while read f; do mv "$f" "./$(echo "${f#./}" | tr '/' '-')"; done
-```
-
-Then rename everything to kebab-case: `hero-desktop.png`, `icon-arrow.svg`.
+- Icons and logos → **SVG**. Photos → **PNG or WebP** directly if possible —
+  otherwise run them through the WebP conversion pass described in §9
+  before they ship (every photo/screenshot asset on the live site is WebP,
+  no exceptions — see §11 2026-09-19).
+- Screenshot the Dev Mode inspect panel for one text element and one button.
+- **Rename every frame before exporting** — the frame name becomes the filename.
+- Flatten slashes and normalize to kebab-case after export:
+  ```bash
+  find . -name '*.png' | while read f; do mv "$f" "./$(echo "${f#./}" | tr '/' '-')"; done
+  ```
+- **Fonts must be Google Fonts** (no locally-installed-font access in a
+  browser-based Figma session).
 
 ---
 
-## 8. Responsive behavior **[FILL IN]**
+## 8. Responsive behavior — confirmed (filled in from the real CSS)
 
-Figma cannot express this. Write it down or it gets guessed.
-
-| Section | Desktop | Mobile |
-|---|---|---|
-| nav | *[FILL IN]* | *[e.g. collapses to hamburger]* |
-| hero | *[FILL IN]* | *[e.g. text centers, image below]* |
-| features | *[e.g. 3 across]* | *[e.g. stacks to 1 column]* |
+| Breakpoint | What changes |
+|---|---|
+| ≤1150px | CD's peek-out shrinks (`--cd-reach` 1.99 → 1.22) so the full-size disc doesn't run into the detail text |
+| ≤1024px | Games grid: 3 columns → 2 |
+| ≤768px | Major stack point: topbar centers and wraps to one row; `.page`'s height cap is dropped and the page scrolls normally instead of being viewport-locked; case-stack shrinks and centers (max-width 220px); game-detail flips from row to column and centers its text; `.detail-screens` becomes full-width (capped 320px); coffee-cup decal shrinks; About layout drops to one column; blog cards stack (image becomes full-width, 160px tall) |
+| ≤480px | Games grid gap/columns tighten further |
+| About-specific: ≤900px | 2-column about layout → 1 column |
+| Blog-specific: ≤620px | Card row → column (this is the actual card breakpoint, independent of the 768px page-wide one) |
 
 ---
 
-## 9. Environment notes (Linux Mint)
+## 9. Environment & workflow notes — current (Windows; supersedes any old
+Linux Mint notes)
 
-- **Node**: do not use `apt install nodejs` — it ships an old version.
-  Use nvm: `curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/master/install.sh | bash`, then `nvm install --lts`.
-  Not needed at all for plain HTML/CSS.
-- **Image tools**: `sudo apt install webp imagemagick optipng` — for converting
-  and compressing Figma exports before shipping them.
-- **Figma has no Linux desktop app.** Browser only. The desktop MCP server
-  (`127.0.0.1:3845`) is therefore unavailable; only the remote Figma plugin exists
-  on this machine, and it needs a paid Figma seat for meaningful use.
-- **Font rendering differs from macOS.** Text will look slightly heavier or
-  thinner than the Figma mock. This is the OS, not the CSS — do not chase it.
-- **No Safari on Linux.** Safari is where CSS usually breaks (`backdrop-filter`,
-  some flexbox gap cases, date inputs). Check on a phone or a Mac before launch,
-  or run it through Playwright's WebKit build.
+- **Dev machine**: Windows. Editing happens through a Claude session linked
+  to the machine over Claude's remote-devices bridge, not a local terminal
+  session — if you're a future Claude session reading this cold, that's why
+  the workflow below looks the way it does rather than a normal git clone.
+- **No local shell on this desktop's bridge** (no `device_bash` reliably
+  available for it as of the 2026-09-19/20 work). The pattern that worked:
+  edit files in Claude's own cloud workspace → verify with a local
+  Playwright mirror → write the result back to the real device with an
+  `expectedMtimeMs` guard (so a hand-edit made directly on the machine
+  between sessions never gets silently clobbered). Always diff device file
+  size/mtime against the last-known state before editing.
+- **Image pipeline**: Pillow-based conversion, PNG/JPG/GIF → WebP.
+  - Quality 85 for `Screens/` and `Blogs/` (photographic screenshots)
+  - Quality 90 for `CD/` and `CD_Case/` (flat art with text/titles that
+    needs more fidelity)
+  - Animated GIF → animated WebP via `save_all=True, append_images=...`
+    (used for the one devlog clip, `Blogs/Derrick/plane2_exampleClip.webp`)
+  - This took total `Assets/` from ~30MB to ~6MB.
+- **Screenshot aspect-ratio convention**: all 21 gameplay screenshots
+  across the 7 games sample close to 16:9 (range 1.774–1.844).
+  `.detail-screens img` hardcodes `aspect-ratio: 16/9` (§11 2026-09-20) —
+  keep any new game's screenshots close to 16:9, or they'll get a
+  noticeably more aggressive `object-fit: cover` crop than the existing ones.
+- **Testing pattern**: Playwright (Chromium) against a deploy-shaped local
+  mirror, loaded via `file://` URLs. One environment-specific quirk worth
+  knowing about: in that specific headless sandbox, the case-stack's
+  `ps-bottom`/`ps-top` art renders as a solid black box in screenshots —
+  confirmed to be a pre-existing artifact of that headless browser, not a
+  real bug (it doesn't reproduce on the actual deployed site). Don't chase
+  it if a future regression screenshot shows it again.
+- **Hosting**: GitHub Pages, serving from the **repo root** (moved off a
+  `Website/` subfolder specifically for this — Pages only serves root or
+  `/docs`, never an arbitrary subfolder). Repo: `ElCappucino/BunyaponPersonalWebsite`.
+- ⚠️ **Git LFS**: GitHub Pages does **not** serve LFS-tracked files
+  correctly — it serves the pointer text instead of the actual image. The
+  repo has an inert `[lfs]` stub in `.git/config` but nothing is tracked.
+  Never run `git lfs track` on anything under `Assets/`, or images will
+  break on the live site.
+- **"Images look out of date" troubleshooting** (came up once already):
+  three caching layers can each cause this — GitHub Pages' own
+  build/deploy (~1 min), the CDN edge cache (~10 min, visible via
+  `Cache-Control` in DevTools → Network), and the browser's own aggressive
+  image cache (usually the actual culprit). Test in a private/incognito
+  window to isolate it. None of this affects a real first-time visitor.
 
 ---
 
 ## 10. Known gaps
 
-Things the Figma file does not contain and that must be decided explicitly:
-
-- Responsive behavior → §8
-- Hover / focus / active / disabled states → export component variants (§4)
-- Scroll and page-load animation → step 5 of the build order
-- Real content — if the design has placeholder text, the real copy is needed
-- Accessibility: focus rings, alt text, color contrast, heading order
+- **Loading UX (active)**: switching games can still flash the *previous*
+  game's screenshot/CD art briefly before the new one paints, especially on
+  a first visit / cold cache. Approaches A (reserved 16:9 box so nothing
+  collapses), B (start loading on click), and C (start loading on hover)
+  are shipped (§11 2026-09-20) and each narrows the window, but the report
+  is that it can still happen. **Approach D — actually clearing/hiding the
+  old image before pointing it at the new `src`, rather than just racing to
+  load the new one faster — is the structural fix and is still open.**
+- 6 of the 7 games' `learnMoreUrl` are still `"#"` placeholders (only
+  Derrick links to a real devlog post). Needs either real devlog posts or a
+  decision to point "Learn More" straight at itch.io/YouTube instead.
+- Grid page prompt text has a typo: "These are my game!" (missing the plural).
+- About page's DEVELOPMENT tag list has "GLFW" listed twice.
+- No favicon.
+- No meta/Open Graph tags (title/description/preview image) — worth adding
+  before sharing the link around, since right now a shared link has no
+  preview card.
+- No CV/résumé download on the About page.
+- If you land on this repo fresh: double-check `Assets/` doesn't still
+  contain the pre-conversion PNG/JPG/GIF originals alongside the `.webp`
+  files — a cleanup pass was scripted for this during the 2026-09-19 deploy
+  but wasn't independently re-verified afterward.
 
 ---
 
 ## 11. Decisions log
 
-Append as things get decided, so future sessions do not re-litigate them.
+Append as things get decided, so future sessions don't re-litigate them.
 
 - *(date)* — *(decision)*
 - 2026-09-17 — §2 seeded with draft token values pixel-sampled from
@@ -239,3 +280,33 @@ Append as things get decided, so future sessions do not re-litigate them.
   scale, spacing, button radius). Marked [ESTIMATED]/[FILL IN] throughout — not yet
   confirmed against Figma Dev Mode (§7). Still open: --color-text-muted,
   --color-border, shadows, max content width, and the full type scale.
+- 2026-09-19 — Deployed to GitHub Pages. Converted all 61 image assets to
+  WebP (~30MB → ~6MB, quality tiers per §9). Moved the site's HTML/CSS/JS
+  from `Website/` to the repo root, since GitHub Pages only serves from
+  root or `/docs`, rewriting every `../Assets/` path and image extension
+  along the way. Added `.gitignore`. Fixed two real bugs found in the
+  process: broken `YYY_Image*` fallback paths in `index.html`, and
+  `posts.js`'s own writing-guide example filenames getting accidentally
+  rewritten by the same path-fixing pass. §2's open token slots
+  (`--color-text-muted`, `--color-border`) are now resolved as
+  "not needed" rather than filled — see §2.
+- 2026-09-20 — Loading-UX pass on the "previous game's image still shows
+  when switching games" report. Shipped, in order, on explicit go-ahead
+  each time:
+  - **A** — `.detail-screens img` now reserves a `16/9 aspect-ratio` box
+    (plus a `--color-surface` fill) so the column can't collapse when an
+    image is cleared or mid-swap.
+  - **B** — a game's screenshots + CD art now start downloading the
+    instant its card is clicked, instead of only after the 250ms fade-out
+    finishes.
+  - **C** — they also now start downloading on hover, ahead of any click
+    (deduped against B so a hover-then-click doesn't refire the same
+    requests; touch devices, which have no hover, still get B as the
+    fallback).
+  All three verified with a Playwright regression suite (request timing,
+  layout stability under a throttled connection, full round-trip through
+  all 7 games at desktop + mobile widths). Still reported as reproducible
+  after A+B+C — see **§10 Known gaps**: Approach **D** (clear/hide the old
+  image before the swap, rather than racing to load the new one faster) is
+  the one that makes the bug structurally impossible rather than just less
+  likely, and is the natural next step if the report continues.
