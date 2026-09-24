@@ -57,6 +57,74 @@
 // ============================================================
 var POSTS = [
   {
+    slug: "flappy-party",
+    title: "What I would do if I had to make Flappy Party again",
+    date: "May 2024",
+    cover: "Assets/Blogs/FlappyParty/flappy_0.webp",
+    highlights: [
+      "Why skipping version control on my first university project still costs me today.",
+      "What I would change about the character customization and event system if I built it again."
+    ],
+    imageBase: "Assets/Blogs/FlappyParty/",
+    body: `
+## What is Flappy Party?
+
+Flappy Party is a 2–4 player local party game. Players take control of a bird and make their way across the map toward the finish line. Every tile they land on triggers a pop-up event that they have to perform in real life.
+
+![](flappy_0.webp)
+
+Flappy Party was the first one-term project I made after I started university. Back then I only knew my way around the Unity interface, and most of the code I wrote was a mix of tutorials I found online and code I assumed should be structured that way.
+
+## Version Control Problem
+
+The biggest mistake I made was not using version control. My team and I didn't really know how to set up Git/GitHub or Plastic SCM, so we just passed the Unity package around between us. Some versions of the project ended up lost, and I had no way to get them back.
+
+![](flappy_2.webp)
+
+That still causes problems today, because there are parts of the code I would like to revisit and reuse, and now I simply can't.
+
+After finishing this project, I went and learned version control properly, and I have used it on every project since — so this isn't a problem I run into anymore, thanks to GitHub.
+
+## Character Customization: What I could do better
+
+Players can change their appearance using preset colors before the match starts.
+
+The approach I took was to make the preset textures outside of Unity in an image editor (Photoshop, in this case). I built a list of materials from all the textures in a single script, then set each character's material using a dictionary.
+
+![](flappy_1.webp)
+![](flappy_color_1.gif)
+
+It worked fine and the results looked good, but the workflow could be better. Because the textures were made entirely outside Unity, any time one needed fixing or I wanted to change a color, I had to go back to Photoshop and reimport it. From a developer’s perspective, it would be much better to change the color inside the engine editor, so nothing needs reimporting.
+
+The solution I found is to use Unity’s Shader Graph to separate the parts that need different colors, then use a “replace color” node to expose the color as an attribute that can be edited in the editor.
+
+[reference system by Geeze](https://www.youtube.com/watch?v=XW2qW1sDj_A)
+
+If I still wanted color presets, I could store the color values in the controller script and reference them from the character selection menu.
+
+This helps a lot with the development pipeline, because artists can adjust the colors inside the engine and the interface stays simple.
+
+## Event System and Scriptable Objects: What I could do better
+
+The event system in this game lets players add their own custom events. The game also ships with a set of default events, defined across multiple ScriptableObjects.
+
+![](flappy_5.webp)
+
+During development I didn’t understand ScriptableObjects well, so I tried to create a new one every time a custom event was added — which doesn’t really make sense, because they aren’t meant to be created at runtime.
+
+If I had the chance to start over, I would store the event data in a .csv table and write a converter that turns it into a list of event data. That would keep the data organized, and designers wouldn’t have to dig through multiple ScriptableObjects. It would mean reimporting the table whenever something needs fixing, but that happens rarely enough that it wouldn’t become a nuisance.
+
+For the save system, I would use plain JSON, saving the data with the event data type defined earlier.
+
+![](flappy_3.webp)
+![Example of how to make a .csv converter](flappy_4.webp)
+
+## Conclusion
+
+To be honest, I’m not really proud of this project, and I wasn’t happy with the outcome when I finished it. But looking back, it is the project that showed me how much I can get through when I struggle with something. It is a reminder that I can work through problems, and that doing so is part of how I became the developer I am now.
+`
+  },
+  {
     slug: "procedural-terrarium",
     title: "Procedural Generation for Terrarium Environment In Unreal Engine 5",
     date: "July 2026",
