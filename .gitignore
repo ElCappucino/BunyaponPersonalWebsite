@@ -10,3 +10,19 @@ desktop.ini
 # Editor settings
 .vscode/
 .idea/
+
+# Pre-conversion image originals — the site only ever loads the .webp
+# version (see DESIGN.md §9's image pipeline). Keep the PNG/JPG/GIF
+# originals on disk locally if you want them for future re-conversion,
+# but don't track them in git / push them to Pages.
+Assets/**/*.png
+Assets/**/*.jpg
+Assets/**/*.jpeg
+Assets/**/*.gif
+
+# ...except files that have NO .webp counterpart — these ARE the served
+# asset, not a leftover original. Keep this list in sync if that changes.
+!Assets/BackToSelectPage.png
+!Assets/Blogs/FlappyParty/flappy_color_1.gif
+!Assets/Blogs/ProceduralTerrarium/ProTer_preset_1.png
+!Assets/Blogs/ProceduralTerrarium/ProTer_rock_ref2.png
