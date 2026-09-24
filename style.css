@@ -137,8 +137,11 @@ img {
   padding: 0 0 0 var(--space-9);
 
   /* Shared with .case-stack and .detail-screens so .detail-info's width can be
-     computed from them — see there. */
-  --case-w: clamp(220px, 20vw, 300px);
+     computed from them — see there. The disc is sized as a % of the case
+     (.ps-cd below), so the case and disc always scale together as one object:
+     their ratio is the same at every window width. Nothing below should ever
+     resize the disc on its own. */
+  --case-w: clamp(180px, 20vw, 300px);
   --screens-w: clamp(210px, 23vw, 340px);
   /* How far the open CD reaches past the case's left edge, as a multiple of the
      case's width (its own width % + left %). */
@@ -285,8 +288,14 @@ img {
 }
 
 .games-stage.is-detail {
-  align-self: center; /* detail view: centered in the remaining viewport
-                          height, the same way .case-stack is */
+  /* Detail view: centered in the remaining viewport height, the same way
+     .case-stack is. Auto margins rather than align-self: center, because
+     when the panel is taller than the window (screenshots stacked under the
+     text, ≤1150px), plain centering pushes the top of it — the title —
+     above the scroll area where it can't be scrolled back to. Auto margins
+     centre when there's room and fall back to top-aligned when there isn't. */
+  align-self: flex-start;
+  margin-block: auto;
 }
 
 .games-stage.is-fading {
@@ -476,21 +485,50 @@ img {
    Responsive
    ========================================================= */
 
-/* Below ~1050px the detail panel has no slack left to sit clear of the case,
-   so the full-size CD (diameter ≈ the case's height) would run into the text.
-   Fall back to a smaller, shorter peek for the rest of the desktop range. */
+/* Below ~1150px there's no longer room for case + disc + text + screenshots
+   side by side. Rather than shrinking the disc (which breaks its ratio to
+   the case), the screenshots move under the description — still a vertical
+   stack, just relocated — and that freed-up width goes to keeping the whole
+   open disc clear of the text. */
 @media (max-width: 1150px) {
-  .games-layout {
-    --cd-reach: 1.22; /* matches the smaller CD's width (94%) + left (28%) below */
+  .game-detail {
+    flex-direction: column;
+    align-items: flex-start;
+    width: 100%;
+    margin-left: 0;
+    /* .games-stage starts right after the case, but the open disc reaches
+       (--cd-reach − 1) case-widths further than that. Pad the text out past
+       it, so the gap from the disc's edge to the text is the same --space-7
+       gap the wide layout above has. */
+    padding-left: calc(var(--case-w) * (var(--cd-reach) - 1));
   }
 
-  .case-stack .ps-cd {
-    width: 94%;
-    left: 0;
+  .detail-info,
+  .detail-screens {
+    width: min(420px, 100%);
   }
 
-  .case-stack.is-open .ps-cd {
-    left: 28%;
+  /* With the screenshots underneath, the panel is much taller than the
+     case, so centring it the way the wide layout does would leave the title
+     floating up by the navbar, well above the case. Instead give the panel a
+     box exactly the case's height and centre THAT, the same way .case-stack
+     is centred — so the two tops line up — and let the rest of the panel
+     (the screenshots) run on below it and scroll. */
+  .games-stage.is-detail {
+    align-self: center;
+    margin-block: 0;
+    height: calc(var(--case-w) * 330 / 172); /* .case-stack's aspect-ratio */
+    /* Box tops alone still leave the title's letters a little low: the
+       black front of the case (.ps-top) is lifted 12px above the case box by
+       its translate, and the title's line box has ~6px of space above its
+       capitals. Nudge up by both, so the letters themselves line up with
+       the black edge. */
+    top: calc(-12px - 6px);
+  }
+
+  .game-detail {
+    padding-bottom: var(--space-7); /* breathing room under the last
+                                       screenshot once scrolled to the end */
   }
 }
 
@@ -524,6 +562,11 @@ img {
                          everything stacks — just flow and scroll normally */
     overflow-y: visible;
     padding: 0 var(--space-5) var(--space-6);
+    /* Small enough that the case plus its open disc (--cd-reach case-widths
+       in all) always fits between the side paddings — the disc keeps the same
+       ratio to the case here as everywhere else, so the pair shrinks
+       together rather than the disc getting clipped at the screen edge. */
+    --case-w: min(220px, calc((100vw - 2 * var(--space-5)) / var(--cd-reach)));
   }
 
   /* Nothing to centre against once everything stacks in one column, so drop
@@ -535,22 +578,45 @@ img {
 
   .case-stack {
     align-self: center;
-    width: 100%;
-    max-width: 220px;
+    width: var(--case-w);
     margin-left: 0; /* no longer pinned to the page edge once it's stacked */
+    transition: margin 0.6s ease; /* same timing as the disc's slide */
   }
 
   /* Stacked this close under the nav, "Back to select page" (which sits just
      above the case) would otherwise overlap it. Scoped to .is-open so the grid
-     view doesn't reserve space for a link that isn't showing. */
+     view doesn't reserve space for a link that isn't showing.
+     The right margin reserves room for the open disc, so it's the case + disc
+     pair that sits centred, not the case alone with the disc hanging off it. */
   .case-stack.is-open {
     margin-top: var(--space-7);
+    margin-right: calc(var(--case-w) * (var(--cd-reach) - 1));
+  }
+
+  /* The case is centred here rather than flush with the screen edge, so the
+     desktop closed position (fully off the case's left edge) would leave the
+     disc sitting in plain view beside it. Tuck it behind the case instead —
+     small enough to clear .ps-top's 16px offset, so no sliver shows between
+     the two case layers — and let it grow back to full size as it slides
+     out. Only the hidden, closed state is smaller; the open disc has the
+     same ratio as desktop. */
+  .case-stack .ps-cd {
+    width: 80%;
+    left: 0;
+    transition: left 0.6s ease, width 0.6s ease;
+  }
+
+  .case-stack.is-open .ps-cd {
+    width: 177%;
+    left: 22%;
   }
 
   .games-stage,
   .games-stage.is-detail {
     align-self: stretch;
     width: 100%;
+    height: auto; /* undo the case-height box (and nudge) from the ≤1150px */
+    top: 0;       /* band — the text sits under the case here, not beside it */
   }
 
   .games-grid {
@@ -564,6 +630,7 @@ img {
     text-align: center;
     width: 100%;
     margin-left: 0;
+    padding-left: 0; /* the disc is above the text here, not beside it */
     padding-right: 0;
   }
 
